@@ -85,10 +85,10 @@ class Game:
         return False
 
     def next_level_branch_check(self, input_text):
-        """Check if `input_text` is really a branch of the next level.
+        """Check if `input_text` corresponds to a branch of next level, return next level branch name.
 
-        Accepts both full name, partial name and just branch letter
-        ex. "level4a", "4a" and "a" are all fine."""
+        `input_text` can be a full level name, partial level name or just
+        a branch letter ex. "level4a", "4a" and "a" are all fine."""
 
         if "level" + str(self.level + 1) + input_text in self.level_mapping[next_level]:
             return input_text
@@ -100,7 +100,7 @@ class Game:
 
     def next_level(self, next_branch_input=''):
         """Advance the game to next level with branch `next_branch_input`.
-        Because next_branch_input can be supplied by user, performs check
+        Because `next_branch_input` can be supplied by user, perform check
         if it is real first.
         
         Throws NoLevelFoundError if there is no such level present.
