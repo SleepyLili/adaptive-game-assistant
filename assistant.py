@@ -85,6 +85,10 @@ class Game:
         return False
 
     def next_level_branch_check(self, input_text):
+        """Check if `input_text` is really a branch of the next level.
+
+        Accepts both full name "level4a" and just letter "a""""
+
         next_level = "level" + str(self.level + 1)
         if next_level + input_text in self.level_mapping[next_level]:
             return input_text
@@ -136,6 +140,8 @@ class Game:
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #
     def print_next_level_fork_names(self):
+        """Print names of next level forks."""
+
         next_level = "level" + str(self.level + 1)
         print("Next level branches are:")
         if next_level in self.level_mapping:
@@ -310,11 +316,12 @@ def game_loop():
                         game.print_next_level_fork_names()
                         print("Choose level's branch:")
                         branch = input()
-                        branch = branch.lower()  # just lowered, no sanitization
+                        branch = branch.lower()
                         game.next_level(branch)
                     else:
                         game.next_level()
-                    print("Level deployed. You can continue playing.")
+                    print("Level deployed.")
+                    print("If you don't see any errors above, you can continue playing.")
                     if (game.level == 5):
                         print("This is the last level of the game.")
                 else:
