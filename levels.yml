@@ -1,0 +1,7 @@
+---
+# level_name: {branch_name: [machines_to_provision]}
+level2: {level2a: [web], level2b:[web]}
+level3: {level3: [web, attacker]}
+level4: {level4a: [web], level4b:[web, attacker]}
+level5: {level5: [web]}
+...
