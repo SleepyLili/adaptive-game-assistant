@@ -87,11 +87,13 @@ class Game:
     def next_level_branch_check(self, input_text):
         """Check if `input_text` is really a branch of the next level.
 
-        Accepts both full name "level4a" and just letter "a""""
+        Accepts both full name, partial name and just branch letter
+        ex. "level4a", "4a" and "a" are all fine."""
 
-        next_level = "level" + str(self.level + 1)
-        if next_level + input_text in self.level_mapping[next_level]:
+        if "level" + str(self.level + 1) + input_text in self.level_mapping[next_level]:
             return input_text
+        if "level" + input_text in self.level_mapping[next_level]:
+            return input_text[1:]
         if input_text in self.level_mapping[next_level]:
             return input_text[6:]
         raise NoLevelFoundError("No branch called {} found.".format(input_text))
