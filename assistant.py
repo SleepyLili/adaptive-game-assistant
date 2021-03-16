@@ -44,6 +44,7 @@ class Game:
         self.read_mapping(mapping_file)
         self.load_times = []
         self.solving_times = []
+        self.level_log = []
         self.level_start_time = 0
         self.level = level_number
         self.branch = ''
@@ -56,10 +57,10 @@ class Game:
 
     def start_game(self):
         """Start a new game, if there isn't one already in progress."""
-
         if (self.level != 0):
             return False
         self.level = 1
+        self.level_log.append("level1") #add level 1
         start_time = time.time()
         subprocess.run(["vagrant", "up"], cwd=self.game_directory,
                        env=dict(os.environ, ANSIBLE_ARGS='--tags \"setup\"'))
@@ -89,7 +90,7 @@ class Game:
 
         `input_text` can be a full level name, partial level name or just
         a branch letter ex. "level4a", "4a" and "a" are all fine."""
-
+        next_level = "level" + str(self.level + 1)
         if "level" + str(self.level + 1) + input_text in self.level_mapping[next_level]:
             return input_text
         if "level" + input_text in self.level_mapping[next_level]:
@@ -98,15 +99,15 @@ class Game:
             return input_text[6:]
         raise NoLevelFoundError("No branch called {} found.".format(input_text))
 
-    def next_level(self, next_branch_input=''):
+    def next_level(self, next_branch_input=""):
         """Advance the game to next level with branch `next_branch_input`.
         Because `next_branch_input` can be supplied by user, perform check
         if it is real first.
         
         Throws NoLevelFoundError if there is no such level present.
-        next_branch == '' is understood as no branch selected, a level
+        next_branch_input == '' is understood as no branch selected, a level
         without possible branching."""
-
+        next_branch = ""
         if (self.level == 0):
             raise NoLevelFoundError("Can't continue, (S)tart the game first!")
         if (not self.next_level_exists()):
@@ -114,12 +115,13 @@ class Game:
         if (self.next_level_is_forked()):
             next_branch = self.next_level_branch_check(next_branch_input)
             # throws NoLevelFoundError
-        elif (next_branch != ''):
+        elif (next_branch_input != ""):
             raise NoLevelFoundError("Next level has no branch, but branch was given.")
         self.solving_times.append(int(time.time() - self.level_start_time))
         self.level += 1
         self.branch = next_branch
         self.levelname = "level" + str(self.level) + self.branch
+        self.level_log.append(self.levelname)
         self.boxes = self.level_mapping["level" + str(self.level)][self.levelname]
         start_time = time.time()
         subprocess.run(["vagrant", "up"] + self.boxes + ["--provision"], 
@@ -176,18 +178,22 @@ class Game:
             print("Game is not in progress.")
         else:
             print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
+            if self.level_log:
+                print("Levels traversed so far:")
+                for level in self.level_log:
+                    print("{} ".format(level), end="")
+                print("")
             print("Setup times:")
-            i = 1
-            for load_time in self.load_times:
-                print("Level {} : ".format(i), end="")
-                self.print_time(load_time, True)
-                i += 1
-            i = 1
-            print("Solving times:")
-            for solving_time in self.solving_times:
-                print("Level {} : ".format(i), end="")
-                self.print_time(solving_time, True)
-                i += 1
+            for i in range(len(self.load_times)):
+                if (i == 0):
+                    print("Setup + ", end="")
+                print("{} : ".format(self.level_log[i]), end="")
+                self.print_time(self.load_times[i], True)
+            if self.solving_times:
+                print("Solving times:")
+                for i in range(len(self.solving_times)):
+                    print("{} : ".format(self.level_log[i]), end="")
+                    self.print_time(self.solving_times[i], True)
 
 
 def print_help():
