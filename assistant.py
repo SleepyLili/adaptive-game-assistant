@@ -45,6 +45,7 @@ class Game:
         self.load_times = []
         self.solving_times = []
         self.level_log = []
+        self.game_start_time = 0
         self.level_start_time = 0
         self.level = level_number
         self.branch = ''
@@ -68,6 +69,7 @@ class Game:
         load_time = int(end_time - start_time)
         self.load_times.append(load_time)
         self.level_start_time = time.time()
+        self.game_start_time = time.time()
         return True
 
     def next_level_exists(self):
@@ -86,10 +88,10 @@ class Game:
         return False
 
     def next_level_branch_check(self, input_text):
-        """Check if `input_text` corresponds to a branch of next level, return next level branch name.
+        """Check if `input_text` is a branch of next level, return next level branch name.
 
         `input_text` can be a full level name, partial level name or just
-        a branch letter ex. "level4a", "4a" and "a" are all fine."""
+        a branch letter. Ex. "level4a", "4a" and "a" are all fine."""
         next_level = "level" + str(self.level + 1)
         if "level" + str(self.level + 1) + input_text in self.level_mapping[next_level]:
             return input_text
@@ -178,6 +180,8 @@ class Game:
             print("Game is not in progress.")
         else:
             print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
+            print("Total time elapsed: ", end="")
+            self.print_time(int(time.time() - self.game_start_time), True)
             if self.level_log:
                 print("Levels traversed so far:")
                 for level in self.level_log:
@@ -187,12 +191,12 @@ class Game:
             for i in range(len(self.load_times)):
                 if (i == 0):
                     print("Setup + ", end="")
-                print("{} : ".format(self.level_log[i]), end="")
+                print("{}: ".format(self.level_log[i]), end="")
                 self.print_time(self.load_times[i], True)
             if self.solving_times:
                 print("Solving times:")
                 for i in range(len(self.solving_times)):
-                    print("{} : ".format(self.level_log[i]), end="")
+                    print("{}: ".format(self.level_log[i]), end="")
                     self.print_time(self.solving_times[i], True)
 
 
