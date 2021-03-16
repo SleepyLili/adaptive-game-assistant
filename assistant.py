@@ -84,8 +84,18 @@ class Game:
                 return True
         return False
 
-    def next_level(self, next_branch=''):
-        """Advance the game to next level with branch `next_branch`.
+    def next_level_branch_check(self, input_text):
+        next_level = "level" + str(self.level + 1)
+        if next_level + input_text in self.level_mapping[next_level]:
+            return input_text
+        if input_text in self.level_mapping[next_level]:
+            return input_text[6:]
+        raise NoLevelFoundError("No branch called {} found.".format(input_text))
+
+    def next_level(self, next_branch_input=''):
+        """Advance the game to next level with branch `next_branch_input`.
+        Because next_branch_input can be supplied by user, performs check
+        if it is real first.
         
         Throws NoLevelFoundError if there is no such level present.
         next_branch == '' is understood as no branch selected, a level
@@ -96,11 +106,8 @@ class Game:
         if (not self.next_level_exists()):
             raise NoLevelFoundError("No next level found! Perhaps you already finished the game?")
         if (self.next_level_is_forked()):
-            next_level = "level" + str(self.level + 1)
-            if next_level + next_branch in self.level_mapping[next_level]:
-                pass
-            else:
-                raise NoLevelFoundError("No branch called {} found.".format(next_branch))
+            next_branch = self.next_level_branch_check(next_branch_input)
+            # throws NoLevelFoundError
         elif (next_branch != ''):
             raise NoLevelFoundError("Next level has no branch, but branch was given.")
         self.solving_times.append(int(time.time() - self.level_start_time))
@@ -128,6 +135,14 @@ class Game:
         self.level_start_time = 0
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #
+    def print_next_level_fork_names(self):
+        next_level = "level" + str(self.level + 1)
+        print("Next level branches are:")
+        if next_level in self.level_mapping:
+            for branch in self.level_mapping[next_level]:
+                print(branch, end="  ")
+        print("")
+
     def print_time(self, load_time, concise=False):
         """Print time in minutes and seconds.
         
@@ -286,17 +301,28 @@ def game_loop():
                 print("To start over, please run `abort` first.")
         elif ((command == "n") or (command == "next")):
             try:
-                print("Going to set up level {}".format(game.level + 1))
-                if game.next_level_is_forked():
-                    print("Choose level's branch:")
-                    branch = input()
-                    branch = branch.lower()  # just lowered, no sanitization
-                    game.next_level(branch)
+                if game.level == 0:
+                    print("Can't continue, (S)tart the game first!")
+                elif game.next_level_exists():
+                    print("Going to set up level {}".format(game.level + 1))
+                    if game.next_level_is_forked():
+                        print("Next level is forked.")
+                        game.print_next_level_fork_names()
+                        print("Choose level's branch:")
+                        branch = input()
+                        branch = branch.lower()  # just lowered, no sanitization
+                        game.next_level(branch)
+                    else:
+                        game.next_level()
+                    print("Level deployed. You can continue playing.")
+                    if (game.level == 5):
+                        print("This is the last level of the game.")
                 else:
-                    game.next_level()
-                print("Level deployed. You can continue playing.")
+                    print("No next levels found -- you finished the game!")
+                    # print("Remember to save your gamefile idk")            
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
+            
         elif ((command == "i") or (command == "info")):
             game.print_info()
         elif ((command == "h") or (command == "help")):
