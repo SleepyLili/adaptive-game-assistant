@@ -42,13 +42,19 @@ class Game:
             (useful when continuing a running game)"""
         self.game_directory = game_directory
         self.read_mapping(mapping_file)
+
         self.load_times = []
         self.solving_times = []
         self.level_log = []
+        
         self.game_start_time = 0
         self.level_start_time = 0
+        
         self.level = level_number
         self.branch = ''
+
+        self.game_in_progress = True
+        self.game_end_time = 0
 
     def read_mapping(self, file):
         """Read a mapping of levels for the adaptive game from a .yml file."""
@@ -71,6 +77,16 @@ class Game:
         self.level_start_time = time.time()
         self.game_start_time = time.time()
         return True
+
+    def finish_game(self):
+        """Mark game as not in progress and log end time, IF on the last level."""
+
+        if (not self.next_level_exists()):
+            self.solving_times.append(int(time.time() - self.level_start_time))
+            self.game_end_time = time.time()
+            self.game_in_progress = False
+            return True
+        return False
 
     def next_level_exists(self):
         """Return true if next level exists."""
@@ -143,7 +159,7 @@ class Game:
         self.level_log = []
         self.game_start_time = 0
         self.level_start_time = 0
-        self.level = level_number
+        self.level = 0
         self.branch = ''
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #
@@ -179,17 +195,26 @@ class Game:
         """Print info about the game in a human-readable way."""
 
         if (self.level == 0):
-            print("Game is not in progress.")
+            print("Game is not yet started.")
         else:
-            print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
-            print("Total time elapsed: ", end="")
-            self.print_time(int(time.time() - self.game_start_time), True)
+            if (self.game_in_progress):
+                if (self.branch):
+                    print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
+                else:
+                    print("Game in progress. Level:{}".format(self.level))
+                print("Total time elapsed: ", end="")
+                self.print_time(int(time.time() - self.game_start_time), True)
+            else:
+                print("Game succesfully finished.")
+                print("Total time played: ", end="")
+                self.print_time(int(self.game_end_time - self.game_start_time), True)
+            
             if self.level_log:
-                print("Levels traversed so far:")
+                print("Levels traversed:")
                 for level in self.level_log:
                     print("{} ".format(level), end="")
                 print("")
-            print("Setup times:")
+            print("Loading times:")
             for i in range(len(self.load_times)):
                 if (i == 0):
                     print("Setup + ", end="")
@@ -340,6 +365,7 @@ def game_loop():
                         print("This is the last level of the game.")
                 else:
                     print("No next levels found -- you finished the game!")
+                    game.finish_game()
                     # print("Remember to save your gamefile idk")            
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
