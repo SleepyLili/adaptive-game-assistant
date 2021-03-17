@@ -138,11 +138,13 @@ class Game:
         """Abort game and reset attributes to their default state."""
 
         subprocess.run(["vagrant", "destroy", "-f"], cwd=self.game_directory)
-        self.level = 0
-        self.branch = ''
         self.load_times = []
         self.solving_times = []
+        self.level_log = []
+        self.game_start_time = 0
         self.level_start_time = 0
+        self.level = level_number
+        self.branch = ''
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #
     def print_next_level_fork_names(self):
