@@ -22,7 +22,7 @@ class Game:
     and it will save loading times and solving times of the player."""
 
     def __init__(self, mapping_file, game_directory,
-                 level_number=0, levelBranch=''):
+                 level_number=0, level_branch=''):
         """Create an object of class Game.
 
         The game itself is NOT started at this point. To start it, call
@@ -51,7 +51,7 @@ class Game:
         self.level_start_time = 0
 
         self.level = level_number
-        self.branch = ''
+        self.branch = level_branch
 
         self.game_in_progress = False
         self.game_finished = False
@@ -86,12 +86,11 @@ class Game:
         Return false if prerequisites were not met, true otherwise."""
         if (self.next_level_exists() or not self.game_in_progress):
             return False
-        else:
-            self.solving_times.append(int(time.time() - self.level_start_time))
-            self.game_end_time = time.time()
-            self.game_in_progress = False
-            self.game_finished = True
-            return True
+        self.solving_times.append(int(time.time() - self.level_start_time))
+        self.game_end_time = time.time()
+        self.game_in_progress = False
+        self.game_finished = True
+        return True
 
     def next_level_exists(self):
         """Return true if next level exists."""
@@ -131,25 +130,24 @@ class Game:
         next_branch_input == '' is understood as no branch selected, a level
         without possible branching."""
         next_branch = ""
-        if (not self.game_in_progress):
+        if not self.game_in_progress:
             raise NoLevelFoundError("Can't continue, (S)tart the game first!")
-        if (not self.next_level_exists()):
+        if not self.next_level_exists():
             raise NoLevelFoundError("No next level found! Perhaps you already finished the game?")
-        if (self.next_level_is_forked()):
+        if self.next_level_is_forked():
             next_branch = self.next_level_branch_check(next_branch_input)
             # throws NoLevelFoundError
-        elif (next_branch_input != ""):
+        elif next_branch_input != "":
             raise NoLevelFoundError("Next level has no branch, but branch was given.")
         self.solving_times.append(int(time.time() - self.level_start_time))
         self.level += 1
         self.branch = next_branch
-        self.levelname = "level" + str(self.level) + self.branch
-        self.level_log.append(self.levelname)
-        self.boxes = self.level_mapping["level" + str(self.level)][self.levelname]
+        level_name = "level" + str(self.level) + self.branch
+        self.level_log.append(level_name)
+        boxes = self.level_mapping["level" + str(self.level)][level_name]
         start_time = time.time()
-        subprocess.run(["vagrant", "up"] + self.boxes + ["--provision"],
-                       cwd=self.game_directory,
-                       env=dict(os.environ, ANSIBLE_ARGS='--tags \"' + self.levelname + '\"'))
+        subprocess.run(["vagrant", "up"] + boxes + ["--provision"], cwd=self.game_directory,
+                       env=dict(os.environ, ANSIBLE_ARGS='--tags \"' + level_name + '\"'))
         end_time = time.time()
         load_time = int(end_time - start_time)
         self.load_times.append(load_time)
@@ -185,7 +183,7 @@ class Game:
 
         If concise is True, prints only numbers and letters."""
 
-        if (load_time < 60):
+        if load_time < 60:
             if concise:
                 print("{}s".format(load_time))
             else:
@@ -201,11 +199,11 @@ class Game:
     def print_info(self):
         """Print info about the game in a human-readable way."""
 
-        if (not self.game_in_progress and not self.game_finished):
+        if not self.game_in_progress and not self.game_finished:
             print("Game is not yet started.")
         else:
-            if (self.game_in_progress):  # in progress implies not finished
-                if (self.branch):
+            if self.game_in_progress:  # in progress implies not finished
+                if self.branch:
                     print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
                 else:
                     print("Game in progress. Level:{}".format(self.level))
@@ -223,7 +221,7 @@ class Game:
                 print("")
             print("Loading times:")
             for i in range(len(self.load_times)):
-                if (i == 0):
+                if i == 0:
                     print("Setup + ", end="")
                 print("{}: ".format(self.level_log[i]), end="")
                 self.print_time(self.load_times[i], True)
@@ -263,8 +261,8 @@ def check_prerequisites():
         print("NOK, Python not found.")
     if found:
         version_number = version.stdout.split(" ", 1)[1].split(".")
-        if (version_number[0] == "3"):
-            if (int(version_number[1]) > 7):
+        if version_number[0] == "3":
+            if int(version_number[1]) > 7:
                 print("OK, Python version higher than 3.7.")
             else:
                 print("NOK, Python version lower than 3.7.")
@@ -281,8 +279,8 @@ def check_prerequisites():
         print("NOK, Vagrant not found.")
     if found:
         version_number = version.stdout.split(" ", 1)[1].split(".")
-        if (version_number[0] == "2"):
-            if (int(version_number[1]) > 1):
+        if version_number[0] == "2":
+            if int(version_number[1]) > 1:
                 print("OK, Vagrant version higher than 2.2.")
             else:
                 print("NOK, Vagrant version lower than 2.2.")
@@ -301,7 +299,7 @@ def check_prerequisites():
         print("If you are on Linux, you don't have VirtualBox installed, NOK.")
     if found:
         version_number = version.stdout.split(".")
-        if (int(version_number[0]) > 5):
+        if int(version_number[0]) > 5:
             print("OK, VirtualBox version higher than 5 detected.")
         else:
             print("NOK, VirtualBox version lower than 6 detected.")
@@ -330,30 +328,30 @@ def game_loop():
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
-    while(True):
+    while True:
         print("Waiting for next input:")
         command = input()
         command = command.lower()
-        if ((command == "a") or (command == "abort")):
+        if command in ("a", "abort"):
             print("Aborting game, deleting all VMs.")
             game.abort_game()
             print("Game aborted, progress reset, VMs deleted.")
-        elif ((command == "e") or (command == "exit")):
+        elif command in ("e", "exit"):
             print("Going to exit assistant, abort game and delete VMs.")
             game.abort_game()
             print("Exiting...")
             return
-        elif ((command == "s") or (command == "start")):
+        elif command in ("s", "start"):
             print("Trying to start the game.")
             print("The initial setup may take a while, up to 20 minutes.")
-            if (game.start_game()):
+            if game.start_game():
                 print("If you do not see any error messages above,")
                 print("then the game was started succesfully!")
                 print("You can start playing now.")
             else:
                 print("Game was not started, it's already in progress!")
                 print("To start over, please run `abort` first.")
-        elif ((command == "n") or (command == "next")):
+        elif command in ("n", "next"):
             try:
                 if game.level == 0:
                     print("Can't continue, (S)tart the game first!")
@@ -370,7 +368,7 @@ def game_loop():
                         game.next_level()
                     print("Level deployed.")
                     print("If you don't see any errors above, you can continue playing.")
-                    if (game.level == 5):
+                    if game.level == 5:
                         print("This is the last level of the game.")
                 else:
                     print("No next levels found -- you probably finished the game!")
@@ -382,13 +380,13 @@ def game_loop():
                     #     print("Game was already marked as finished earlier.")
                     # else:
                     #     print("Could not finish game, but there are no other levelse either.")
-                    #     print("This situation should not happen.") # TODO: look at this again later
+                    #     print("This situation should not happen.") # TODO: look at this again
                     # print("Remember to save your gamefile idk")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
 
-        elif ((command == "f") or (command == "finish")):
-            if (game.finish_game()):
+        elif command in ("f", "finish"):
+            if game.finish_game():
                 print("Game finished, total time logged!")
             elif (not game.game_in_progress and not game.game_finished):
                 print("Can't finish game, game was not started yet.")
@@ -397,11 +395,11 @@ def game_loop():
             else:
                 print("Could not finish game.")
                 print("Make sure you are on the last level!")
-        elif ((command == "i") or (command == "info")):
+        elif command in ("i", "info"):
             game.print_info()
-        elif ((command == "h") or (command == "help")):
+        elif command in ("h", "help"):
             print_help()
-        elif ((command == "c") or (command == "check")):
+        elif command in ("c", "check"):
             check_prerequisites()
         else:
             print("Unknown command. Enter another command or try (H)elp.")
