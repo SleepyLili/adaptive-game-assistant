@@ -79,9 +79,11 @@ class Game:
         return True
 
     def finish_game(self):
-        """Mark game as not in progress and log end time, IF on the last level."""
+        """Mark game as not in progress and log end time, if on the last level.
+        
+        Return false if prerequisites were not met, true otherwise."""
 
-        if (not self.next_level_exists()):
+        if (not self.next_level_exists() and self.game_in_progress):
             self.solving_times.append(int(time.time() - self.level_start_time))
             self.game_end_time = time.time()
             self.game_in_progress = False
@@ -231,14 +233,15 @@ def print_help():
     """Print list of arguments that game_loop accepts."""
 
     print("Functions that control the game:")
-    print("(A)bort - destroys all VMs, resets progress to level 0.")
-    print("(E)xit  - aborts run, then exits the assistant.")
-    print("(S)tart - starts a new run of the adaptive game, if one isn't in progress.")
-    print("(N)ext  - advances to the next level. Asks for branch when applicable.")
-    print("(I)nfo  - displays info about current run - Level number and name.")
+    print("(A)bort  - destroys all VMs, resets progress to level 0.")
+    print("(E)xit   - aborts run, then exits the assistant.")
+    print("(S)tart  - starts a new run of the adaptive game, if one isn't in progress.")
+    print("(N)ext   - advances to the next level. Asks for branch when applicable.")
+    print("(F)inish - when on the last level, finishes the game and logs end time.")
+    print("(I)nfo   - displays info about current run - Level number and name.")
     print("Helper functions:")
-    print("(H)elp  - explains all commands on the screen.")
-    print("(C)heck - checks if prerequisites to run the game are installed.")
+    print("(H)elp   - explains all commands on the screen.")
+    print("(C)heck  - checks if prerequisites to run the game are installed.")
 
 
 def check_prerequisites():
@@ -307,14 +310,15 @@ def game_loop():
     Possible inputs
     ---------------
     Functions that control the game:
-    (A)bort - destroys all VMs, resets progress to level 0.
-    (E)xit  - aborts run, then exits the assistant.
-    (S)tart - starts a new run of the adaptive game, if one isn't in progress.
-    (N)ext  - advances to the next level. Asks for branch when applicable.
-    (I)nfo  - displays info about current run - Level number and name.
+    (A)bort  - destroys all VMs, resets progress to level 0.
+    (E)xit   - aborts run, then exits the assistant.
+    (S)tart  - starts a new run of the adaptive game, if one isn't in progress.
+    (N)ext   - advances to the next level. Asks for branch when applicable.
+    (F)inish - when on the last level, finishes the game and logs end time.
+    (I)nfo   - displays info about current run - Level number and name.
     Helper functions:
-    (H)elp  - explains all commands on the screen.
-    (C)heck - checks if prerequisites to run the game are installed.
+    (H)elp   - explains all commands on the screen.
+    (C)heck  - checks if prerequisites to run the game are installed.
     """
 
     game = Game("levels.yml", "../game")
@@ -364,12 +368,27 @@ def game_loop():
                     if (game.level == 5):
                         print("This is the last level of the game.")
                 else:
-                    print("No next levels found -- you finished the game!")
-                    game.finish_game()
-                    # print("Remember to save your gamefile idk")            
+                    print("No next levels found -- you probably finished the game!")
+                    print("Make sure to run (F)inish before exiting.")
+                    # if (game.finish_game()):
+                    #     print("Game finished, total time logged!")
+                    #     print("You don't need to run (F)inish again.")
+                    # elif (not game.game_in_progress)
+                    #     print("Game was already marked as finished earlier.")
+                    # else:
+                    #     print("Could not finish game, but there are no other levelse either.")
+                    #     print("This situation should not happen.") # TODO: look at this again later
+                    # print("Remember to save your gamefile idk")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
             
+        elif ((command == "f") or (command == "finish")):
+            if (game.finish_game())
+                print("Game finished, total time logged!")
+            elif (not game.game_in_progress)
+                print("Game was already marked as finished earlier.")
+            else:
+                print("Could not finish game. Make sure you are on the last level!")
         elif ((command == "i") or (command == "info")):
             game.print_info()
         elif ((command == "h") or (command == "help")):
