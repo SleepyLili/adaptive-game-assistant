@@ -53,7 +53,8 @@ class Game:
         self.level = level_number
         self.branch = ''
 
-        self.game_in_progress = True
+        self.game_in_progress = False
+        self.game_finished = False
         self.game_end_time = 0
 
     def read_mapping(self, file):
@@ -64,10 +65,11 @@ class Game:
 
     def start_game(self):
         """Start a new game, if there isn't one already in progress."""
-        if (self.level != 0):
+        if (self.game_in_progress or self.game_finished):
             return False
+        self.game_in_progress = True
         self.level = 1
-        self.level_log.append("level1") #add level 1
+        self.level_log.append("level1") # add level 1 to log
         start_time = time.time()
         subprocess.run(["vagrant", "up"], cwd=self.game_directory,
                        env=dict(os.environ, ANSIBLE_ARGS='--tags \"setup\"'))
@@ -82,13 +84,14 @@ class Game:
         """Mark game as not in progress and log end time, if on the last level.
         
         Return false if prerequisites were not met, true otherwise."""
-
-        if (not self.next_level_exists() and self.game_in_progress):
+        if (self.next_level_exists() or not self.game_in_progress):
+            return False
+        else:
             self.solving_times.append(int(time.time() - self.level_start_time))
             self.game_end_time = time.time()
             self.game_in_progress = False
+            self.game_finished = True
             return True
-        return False
 
     def next_level_exists(self):
         """Return true if next level exists."""
@@ -128,7 +131,7 @@ class Game:
         next_branch_input == '' is understood as no branch selected, a level
         without possible branching."""
         next_branch = ""
-        if (self.level == 0):
+        if (not self.game_in_progress):
             raise NoLevelFoundError("Can't continue, (S)tart the game first!")
         if (not self.next_level_exists()):
             raise NoLevelFoundError("No next level found! Perhaps you already finished the game?")
@@ -161,6 +164,8 @@ class Game:
         self.level_log = []
         self.game_start_time = 0
         self.level_start_time = 0
+        self.game_in_progress = False
+        self.game_finished = False
         self.level = 0
         self.branch = ''
 
@@ -196,10 +201,10 @@ class Game:
     def print_info(self):
         """Print info about the game in a human-readable way."""
 
-        if (self.level == 0):
+        if (not self.game_in_progress and not self.game_finished):
             print("Game is not yet started.")
         else:
-            if (self.game_in_progress):
+            if (self.game_in_progress): #in progress implies not finished
                 if (self.branch):
                     print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
                 else:
@@ -383,12 +388,15 @@ def game_loop():
                 print("Error encountered: {}".format(err))
             
         elif ((command == "f") or (command == "finish")):
-            if (game.finish_game())
+            if (game.finish_game()):
                 print("Game finished, total time logged!")
-            elif (not game.game_in_progress)
-                print("Game was already marked as finished earlier.")
+            elif (not game.game_in_progress and not game.game_finished):
+                print("Can't finish game, game was not started yet.")
+            elif (not game.game_in_progress and game.game_finished):
+                print("Can't finish game, game was already finished earlier.")
             else:
-                print("Could not finish game. Make sure you are on the last level!")
+                print("Could not finish game.")
+                print("Make sure you are on the last level!")
         elif ((command == "i") or (command == "info")):
             game.print_info()
         elif ((command == "h") or (command == "help")):
