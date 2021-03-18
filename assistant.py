@@ -21,13 +21,13 @@ class Game:
     it will keep track of the level and branch the player is on,
     and it will save loading times and solving times of the player."""
 
-    def __init__(self, mapping_file, game_directory, 
+    def __init__(self, mapping_file, game_directory,
                  level_number=0, levelBranch=''):
         """Create an object of class Game.
-        
+
         The game itself is NOT started at this point. To start it, call
         self.start_game() next.
-        
+
         Parameters
         ----------
         mapping_file
@@ -35,10 +35,10 @@ class Game:
         game_directory
             directory with the game files (Vagrantfile, etc.)
         levelNumber
-            number of level to start on 
+            number of level to start on
             (useful when continuing a running game)
         levelBranch
-            branch of level being started on 
+            branch of level being started on
             (useful when continuing a running game)"""
         self.game_directory = game_directory
         self.read_mapping(mapping_file)
@@ -46,10 +46,10 @@ class Game:
         self.load_times = []
         self.solving_times = []
         self.level_log = []
-        
+
         self.game_start_time = 0
         self.level_start_time = 0
-        
+
         self.level = level_number
         self.branch = ''
 
@@ -69,7 +69,7 @@ class Game:
             return False
         self.game_in_progress = True
         self.level = 1
-        self.level_log.append("level1") # add level 1 to log
+        self.level_log.append("level1")  # add level 1 to log
         start_time = time.time()
         subprocess.run(["vagrant", "up"], cwd=self.game_directory,
                        env=dict(os.environ, ANSIBLE_ARGS='--tags \"setup\"'))
@@ -82,7 +82,7 @@ class Game:
 
     def finish_game(self):
         """Mark game as not in progress and log end time, if on the last level.
-        
+
         Return false if prerequisites were not met, true otherwise."""
         if (self.next_level_exists() or not self.game_in_progress):
             return False
@@ -126,7 +126,7 @@ class Game:
         """Advance the game to next level with branch `next_branch_input`.
         Because `next_branch_input` can be supplied by user, perform check
         if it is real first.
-        
+
         Throws NoLevelFoundError if there is no such level present.
         next_branch_input == '' is understood as no branch selected, a level
         without possible branching."""
@@ -147,7 +147,7 @@ class Game:
         self.level_log.append(self.levelname)
         self.boxes = self.level_mapping["level" + str(self.level)][self.levelname]
         start_time = time.time()
-        subprocess.run(["vagrant", "up"] + self.boxes + ["--provision"], 
+        subprocess.run(["vagrant", "up"] + self.boxes + ["--provision"],
                        cwd=self.game_directory,
                        env=dict(os.environ, ANSIBLE_ARGS='--tags \"' + self.levelname + '\"'))
         end_time = time.time()
@@ -182,7 +182,7 @@ class Game:
 
     def print_time(self, load_time, concise=False):
         """Print time in minutes and seconds.
-        
+
         If concise is True, prints only numbers and letters."""
 
         if (load_time < 60):
@@ -204,7 +204,7 @@ class Game:
         if (not self.game_in_progress and not self.game_finished):
             print("Game is not yet started.")
         else:
-            if (self.game_in_progress): #in progress implies not finished
+            if (self.game_in_progress):  # in progress implies not finished
                 if (self.branch):
                     print("Game in progress. Level:{} Branch:{}".format(self.level, self.branch))
                 else:
@@ -215,7 +215,7 @@ class Game:
                 print("Game succesfully finished.")
                 print("Total time played: ", end="")
                 self.print_time(int(self.game_end_time - self.game_start_time), True)
-            
+
             if self.level_log:
                 print("Levels traversed:")
                 for level in self.level_log:
@@ -311,7 +311,7 @@ def game_loop():
     """Interactively assist the player with playing the game.
 
     Transform inputs from user into method calls.
-    
+
     Possible inputs
     ---------------
     Functions that control the game:
@@ -386,7 +386,7 @@ def game_loop():
                     # print("Remember to save your gamefile idk")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
-            
+
         elif ((command == "f") or (command == "finish")):
             if (game.finish_game()):
                 print("Game finished, total time logged!")
