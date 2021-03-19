@@ -383,17 +383,8 @@ def game_loop():
                     if game.level == 5:  # TODO: maybe remove hardcode
                         print("This is the last level of the game.")
                 else:
-                    print("No next levels found -- you probably finished the game!")
-                    print("Make sure to run (F)inish before exiting.")
-                    # if (game.finish_game()):
-                    #     print("Game finished, total time logged!")
-                    #     print("You don't need to run (F)inish again.")
-                    # elif (not game.game_in_progress)
-                    #     print("Game was already marked as finished earlier.")
-                    # else:
-                    #     print("Could not finish game, but there are no other levelse either.")
-                    #     print("This situation should not happen.") # TODO: look at this again
-                    # print("Remember to save your gamefile idk")
+                    print("No next levels found -- you finished the game!")
+                    print("Make sure to run (F)inish and (D)ump before exiting.")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
 
