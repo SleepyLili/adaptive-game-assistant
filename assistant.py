@@ -57,12 +57,6 @@ class Game:
         self.game_finished = False
         self.game_end_time = 0
 
-    def read_mapping(self, file):
-        """Read a mapping of levels for the adaptive game from a .yml file."""
-
-        with open(file) as f:
-            self.level_mapping = yaml.load(f, Loader=yaml.FullLoader)
-
     def start_game(self):
         """Start a new game, if there isn't one already in progress."""
         if (self.game_in_progress or self.game_finished):
@@ -154,8 +148,13 @@ class Game:
         self.level_start_time = time.time()
 
     def abort_game(self):
-        """Abort game and reset attributes to their default state."""
-
+        """Abort game and reset attributes to their default state.
+        
+        If a 'dumps' subfolder exists, also dumps the current game log
+        to a file before aborting."""
+        
+        if os.path.isdir("dumps"):
+            self.dump_to_file("dumps/aborted_game" + str(time.time())) # TODO: maybe 
         subprocess.run(["vagrant", "destroy", "-f"], cwd=self.game_directory)
         self.load_times = []
         self.solving_times = []
@@ -166,6 +165,17 @@ class Game:
         self.game_finished = False
         self.level = 0
         self.branch = ''
+    # # # METHODS THAT WORK WITH FILES # # #
+    def read_mapping(self, filename):
+        """Read a mapping of levels for the adaptive game from a YAML file."""
+
+        with open(filename) as f:
+            self.level_mapping = yaml.load(f, Loader=yaml.FullLoader)
+
+    def dump_to_file(self, filename):
+        """Dump the current game state and logs into a YAML file."""
+        with open(filename, 'w') as f:
+            yaml.dump(self, f)
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #
     def print_next_level_fork_names(self):
@@ -242,6 +252,7 @@ def print_help():
     print("(N)ext   - advances to the next level. Asks for branch when applicable.")
     print("(F)inish - when on the last level, finishes the game and logs end time.")
     print("(I)nfo   - displays info about current run - Level number and name.")
+    print("(D)ump   - dump (save) the information about the game into a file.")
     print("Helper functions:")
     print("(H)elp   - explains all commands on the screen.")
     print("(C)heck  - checks if prerequisites to run the game are installed.")
@@ -319,6 +330,7 @@ def game_loop():
     (N)ext   - advances to the next level. Asks for branch when applicable.
     (F)inish - when on the last level, finishes the game and logs end time.
     (I)nfo   - displays info about current run - Level number and name.
+    (D)ump   - dump (save) the information about the game into a file.
     Helper functions:
     (H)elp   - explains all commands on the screen.
     (C)heck  - checks if prerequisites to run the game are installed.
@@ -368,7 +380,7 @@ def game_loop():
                         game.next_level()
                     print("Level deployed.")
                     print("If you don't see any errors above, you can continue playing.")
-                    if game.level == 5:
+                    if game.level == 5:  # TODO: maybe remove hardcode
                         print("This is the last level of the game.")
                 else:
                     print("No next levels found -- you probably finished the game!")
@@ -387,7 +399,7 @@ def game_loop():
 
         elif command in ("f", "finish"):
             if game.finish_game():
-                print("Game finished, total time logged!")
+                print("Game finished, total time saved!")
             elif (not game.game_in_progress and not game.game_finished):
                 print("Can't finish game, game was not started yet.")
             elif (not game.game_in_progress and game.game_finished):
@@ -401,6 +413,26 @@ def game_loop():
             print_help()
         elif command in ("c", "check"):
             check_prerequisites()
+        elif command in ("d", "dump"):
+            if not os.path.isdir("dumps"):
+                try:
+                    os.mkdir("dumps")
+                except FileExistsError:
+                    pass #directory already exists
+
+            if os.path.exists("dumps/game_dump.yml"):
+                print("It appears that there is already a game dump.")
+                print("Write 'yes' to overwrite it.")
+                confirmation = input()
+                confirmation = confirmation.lower()
+                if (confirmation == "yes"):
+                    print("Overwriting dump file...")
+                    game.dump_to_file("dumps/game_dump.yml")
+                else:
+                    print("File not overwritten.")
+                # except other errors? TODO: look it up
+            else:
+                game.dump_to_file("dumps/game_dump.yml")
         else:
             print("Unknown command. Enter another command or try (H)elp.")
 
