@@ -98,7 +98,23 @@ def game_loop():
     (C)heck  - checks if prerequisites to run the game are installed.
     """
 
-    game = Game("levels.yml", "../game")
+    if not os.path.isdir("dumps"):
+        try:
+            os.mkdir("dumps")
+        except FileExistsError:
+            pass #directory already exists, all OK
+        except OSError as err:
+            print("Error encountered while creating the /dumps subfolder for save data:")
+            print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+            print("If not fixed, saving game data might not be possible.")
+    try:
+        game = Game("levels.yml", "../game")
+    except OSError as err:
+        print("Error encountered while setting up the game object.")
+        print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        print("(Most likely, `levels.yml` file couldn't be read.")
+        print("Make sure it is in the folder, and readable.")
+
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
@@ -167,12 +183,6 @@ def game_loop():
         elif command in ("c", "check"):
             check_prerequisites()
         elif command in ("d", "dump"):
-            if not os.path.isdir("dumps"):
-                try:
-                    os.mkdir("dumps")
-                except FileExistsError:
-                    pass #directory already exists
-
             if os.path.exists("dumps/game_dump.yml"):
                 print("It appears that there is already a game dump.")
                 print("Write 'yes' to overwrite it.")
@@ -183,7 +193,6 @@ def game_loop():
                     game.dump_to_file("dumps/game_dump.yml")
                 else:
                     print("File not overwritten.")
-                # except other errors? TODO: look it up
             else:
                 game.dump_to_file("dumps/game_dump.yml")
         else:
