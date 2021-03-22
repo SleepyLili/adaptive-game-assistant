@@ -1,0 +1,3 @@
+/dumps/*
+/adaptive_game_module/__pycache__/*
+pylint.txt
