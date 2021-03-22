@@ -1,0 +1,33 @@
+---
+# level_name: level+branch name: hint title: hint text
+level1: 
+  level1: 
+    1: "You can't see the link, but it's right there on the webpage."
+    2: "Look into the page's source code."
+level2:
+  level2a:
+    "Where to start": "The login form communicates with a database which stores usernames and passwords in one of its tables. However, you do not need to know, discover or extract the credentials to bypass the login."
+    "Database": "The webpage uses PHP, and the database uses SQL. It is possible to misuse the potential weakness in the authentication process by injecting malicious input."
+    "Input": "The input from input fields is placed directly into an SQL query as it is. In case of unexpected input (like an extra '), you could convince SQL to execute entirely different code than it's supposed to."
+  level2b:
+    "Where to start": "The login form communicates with a database which stores usernames and passwords in one of its tables. However, you do not need to know, discover or extract the credentials to bypass the login."
+    "Database": "The webpage uses PHP, and the database uses SQL. It is possible to misuse the potential weakness in the authentication process by injecting malicious input."
+    "Input": "Some input from input fields is placed directly into an SQL query as it is. In case of unexpected input (like an extra '), you could convince SQL to execute entirely different code than it's supposed to."
+level3:
+  level3:
+    "Webshell": "Your web shell is a regular php file. You need to find a way to place it on the webserver and then open it."
+    "How": "You can write into a directory only if you have sufficient privileges (access rights) to that directory."
+    "Flag location": "The FLAG file is located at the top of the UNIX file system hierarchy in the / folder."
+level4:
+  level4a:
+    "Credentials location": "Before you can access the database, you have to search the filesystem for a file with useful information like credentials. Try looking at a location which you have already visited in a previous level."
+    "Database interaction": "Use the [SQL] button in the web shell to interact with log into local databases and interact with them using SQL queries."
+  level4b:
+    "Password cracking": "The password appears to be encrypted with a simple MD5 hash. A tool like John the Ripper, which is already installed on the computer, could be used to crack the password."
+    "Command line options": 'The arguments you will need to crack the password are "--format=" and "--wordlist="'
+    "Database interaction": "Use the [SQL] button in the web shell to interact with log into local databases and interact with them using SQL queries."
+level5:
+  level5:
+    "Database interaction": "You can communicate with local databases using SQL queries."
+    "SQL commands": "To update an SQL row, you will find UPDATE statement useful. You can specify what column and row you are updating with WHERE clausule."
+...
