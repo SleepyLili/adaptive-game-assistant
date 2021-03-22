@@ -149,14 +149,15 @@ class Game:
     def abort_game(self):
         """Abort game and reset attributes to their default state.
         
-        If a 'dumps' subfolder exists, also dumps the current game log
+        If a /logs subfolder exists, also logs the current game log
         to a file before aborting."""
         try:
-            if os.path.isdir("dumps"):
-                self.dump_to_file("dumps/aborted_game" + str(time.time()))
+            if os.path.isdir("logs"):
+                self.log_to_file("logs/aborted_game" + str(time.time()))
         except OSError as err:
             # print("Failed to save game log.")
             # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+            pass
         subprocess.run(["vagrant", "destroy", "-f"], cwd=self.game_directory)
         self.load_times = []
         self.solving_times = []
@@ -174,8 +175,8 @@ class Game:
         with open(filename) as f:
             self.level_mapping = yaml.load(f, Loader=yaml.FullLoader)
 
-    def dump_to_file(self, filename): # raise OSError when file can't be opened
-        """Dump the current game state and logs into a YAML file."""
+    def log_to_file(self, filename): # raise OSError when file can't be opened
+        """Log the current game state and logs into a YAML file."""
         with open(filename, 'w') as f:
             yaml.dump(self, f)
 

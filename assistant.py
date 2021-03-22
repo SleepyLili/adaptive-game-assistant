@@ -15,7 +15,7 @@ def print_help():
     print("(N)ext   - advances to the next level. Asks for branch when applicable.")
     print("(F)inish - when on the last level, finishes the game and logs end time.")
     print("(I)nfo   - displays info about current run - Level number and name.")
-    print("(D)ump   - dump (save) the information about the game into a file.")
+    print("(L)og    - log (save) the information about the game into a file.")
     print("Helper functions:")
     print("(H)elp   - explains all commands on the screen.")
     print("(C)heck  - checks if prerequisites to run the game are installed.")
@@ -92,19 +92,19 @@ def game_loop():
     (N)ext   - advances to the next level. Asks for branch when applicable.
     (F)inish - when on the last level, finishes the game and logs end time.
     (I)nfo   - displays info about current run - Level number and name.
-    (D)ump   - dump (save) the information about the game into a file.
+    (L)og    - log (save) the information about the game into a file.
     Helper functions:
     (H)elp   - explains all commands on the screen.
     (C)heck  - checks if prerequisites to run the game are installed.
     """
 
-    if not os.path.isdir("dumps"):
+    if not os.path.isdir("logs"):
         try:
-            os.mkdir("dumps")
+            os.mkdir("logs")
         except FileExistsError:
             pass #directory already exists, all OK
         except OSError as err:
-            print("Error encountered while creating the /dumps subfolder for save data:")
+            print("Error encountered while creating the /logs subfolder for save data:")
             print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
             print("If not fixed, saving game data might not be possible.")
     try:
@@ -182,19 +182,20 @@ def game_loop():
             print_help()
         elif command in ("c", "check"):
             check_prerequisites()
-        elif command in ("d", "dump"):
-            if os.path.exists("dumps/game_dump.yml"):
-                print("It appears that there is already a game dump.")
+        elif command in ("l", "log"):
+            if os.path.exists("logs/game_log.yml"):
+                print("It appears that there is already a saved game log.")
                 print("Write 'yes' to overwrite it.")
                 confirmation = input()
                 confirmation = confirmation.lower()
                 if (confirmation == "yes"):
-                    print("Overwriting dump file...")
-                    game.dump_to_file("dumps/game_dump.yml")
+                    print("Overwriting file...")
+                    game.log_to_file("logs/game_log.yml")
                 else:
                     print("File not overwritten.")
             else:
-                game.dump_to_file("dumps/game_dump.yml")
+                print("Writing file...")
+                game.log_to_file("logs/game_log.yml")
         else:
             print("Unknown command. Enter another command or try (H)elp.")
 
