@@ -7,7 +7,7 @@ import yaml  # reads level configurations from a .yml file
 
 
 class NoLevelFoundError(Exception):
-    """Error thrown by the Game class when a nonexistant level is selected."""
+    """Error raised by the Game class when a nonexistant level is selected."""
 
     def __init__(self, message):
         self.message = message
@@ -119,7 +119,7 @@ class Game:
         Because `next_branch_input` can be supplied by user, perform check
         if it is real first.
 
-        Throws NoLevelFoundError if there is no such level present.
+        Raise NoLevelFoundError if there is no such level present.
         next_branch_input == '' is understood as no branch selected, a level
         without possible branching."""
         next_branch = ""
@@ -129,7 +129,7 @@ class Game:
             raise NoLevelFoundError("No next level found! Perhaps you already finished the game?")
         if self.next_level_is_forked():
             next_branch = self.next_level_branch_check(next_branch_input)
-            # throws NoLevelFoundError
+            # raises NoLevelFoundError
         elif next_branch_input != "":
             raise NoLevelFoundError("Next level has no branch, but branch was given.")
         self.solving_times.append(int(time.time() - self.level_start_time))
@@ -151,9 +151,12 @@ class Game:
         
         If a 'dumps' subfolder exists, also dumps the current game log
         to a file before aborting."""
-        
-        if os.path.isdir("dumps"):
-            self.dump_to_file("dumps/aborted_game" + str(time.time())) # TODO: maybe 
+        try:
+            if os.path.isdir("dumps"):
+                self.dump_to_file("dumps/aborted_game" + str(time.time()))
+        except OSError as err:
+            # print("Failed to save game log.")
+            # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
         subprocess.run(["vagrant", "destroy", "-f"], cwd=self.game_directory)
         self.load_times = []
         self.solving_times = []
@@ -165,13 +168,13 @@ class Game:
         self.level = 0
         self.branch = ''
     # # # METHODS THAT WORK WITH FILES # # #
-    def read_mapping(self, filename):
+    def read_mapping(self, filename): # raise OSError when file can't be opened
         """Read a mapping of levels for the adaptive game from a YAML file."""
 
         with open(filename) as f:
             self.level_mapping = yaml.load(f, Loader=yaml.FullLoader)
 
-    def dump_to_file(self, filename):
+    def dump_to_file(self, filename): # raise OSError when file can't be opened
         """Dump the current game state and logs into a YAML file."""
         with open(filename, 'w') as f:
             yaml.dump(self, f)
