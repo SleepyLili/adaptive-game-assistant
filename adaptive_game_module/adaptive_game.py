@@ -148,7 +148,7 @@ class Game:
 
     def abort_game(self):
         """Abort game and reset attributes to their default state.
-        
+
         If a /logs subfolder exists, also logs the current game log
         to a file before aborting."""
         try:
