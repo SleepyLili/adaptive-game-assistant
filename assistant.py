@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from adaptive_game_module.adaptive_game import Game
+from adaptive_game_module.hint_giver import HintGiver
 
 import subprocess
 import os
@@ -114,7 +115,7 @@ def game_loop():
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
         print("(Most likely, `levels.yml` file couldn't be read.")
         print("Make sure it is in the folder, and readable.")
-
+    hint_giver = HintGiver("resources/hints.yml")
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
@@ -176,7 +177,7 @@ def game_loop():
             else:
                 print("Could not finish game.")
                 print("Make sure you are on the last level!")
-        elif command in ("i", "info"):
+        elif command in ("i", "info", "information"):
             game.print_info()
         elif command in ("h", "help"):
             print_help()
@@ -196,6 +197,17 @@ def game_loop():
             else:
                 print("Writing file...")
                 game.log_to_file("logs/game_log.yml")
+        elif command in ("t", "hint"):
+            if hint_giver.show_taken_hints("level" + str(game.level), game.branch) != []:
+                print("Hints taken in current level:")
+                for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
+                    print("{}: {}".format(hint, hint_giver.take_hint(level, branch, hint)))
+            print("Choose which hint to take:")
+            print("0: (cancel, take no hint)")
+            i = 1
+            for hint in hint_giver.show_possible_hints("level" + str(game.level), game.branch):
+                print("{}: {}".format(i, hint))
+                i += 1
         else:
             print("Unknown command. Enter another command or try (H)elp.")
 

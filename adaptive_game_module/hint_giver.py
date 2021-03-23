@@ -25,6 +25,8 @@ class HintGiver:
         return self.hints[level][level+branch][hint_name]
 
     def show_taken_hints(self, level, branch):
+        if not level+branch in self.hints_taken:
+            return []
         return self.hints_taken[level+branch]
 
     def is_hint_name(self, level, branch, hint_name):
