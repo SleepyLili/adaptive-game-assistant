@@ -33,3 +33,7 @@ class HintGiver:
         if hint_name in self.hints[level][level+branch]:
             return True
         return False
+
+    def log_to_file(self, filename):
+        with open(filename, 'a') as f:
+            yaml.dump(self, f)

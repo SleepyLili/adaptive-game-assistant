@@ -177,7 +177,7 @@ class Game:
 
     def log_to_file(self, filename): # raise OSError when file can't be opened
         """Log the current game state and logs into a YAML file."""
-        with open(filename, 'w') as f:
+        with open(filename, 'a') as f:
             yaml.dump(self, f)
 
     # # # METHODS THAT OUTPUT INTO STDOUT # # #

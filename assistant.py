@@ -79,6 +79,15 @@ def check_prerequisites():
         else:
             print("NOK, VirtualBox version lower than 6 detected.")
 
+def write_log(filename, game, hint_giver):
+    try:
+        game.log_to_file(filename)
+        hint_giver.log_to_file(filename)
+    except OSError:
+        print("Error encountered while saving game data:")
+        print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        print("Double check that location {} for the file exists and can be written to.".format(filename))
+
 def game_loop():
     """Interactively assist the player with playing the game.
 
@@ -163,7 +172,7 @@ def game_loop():
                         print("This is the last level of the game.")
                 else:
                     print("No next levels found -- you finished the game!")
-                    print("Make sure to run (F)inish and (D)ump before exiting.")
+                    print("Make sure to run (F)inish and (L)og your progress before exiting.")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
 
@@ -191,23 +200,39 @@ def game_loop():
                 confirmation = confirmation.lower()
                 if (confirmation == "yes"):
                     print("Overwriting file...")
-                    game.log_to_file("logs/game_log.yml")
+                    write_log("logs/game_log.yml", game, hint_giver)
                 else:
                     print("File not overwritten.")
             else:
                 print("Writing file...")
-                game.log_to_file("logs/game_log.yml")
+                write_log("logs/game_log.yml", game, hint_giver)
         elif command in ("t", "hint"):
-            if hint_giver.show_taken_hints("level" + str(game.level), game.branch) != []:
-                print("Hints taken in current level:")
-                for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
-                    print("{}: {}".format(hint, hint_giver.take_hint(level, branch, hint)))
-            print("Choose which hint to take:")
-            print("0: (cancel, take no hint)")
-            i = 1
-            for hint in hint_giver.show_possible_hints("level" + str(game.level), game.branch):
-                print("{}: {}".format(i, hint))
-                i += 1
+            if not game.game_in_progress:
+                print("Game not started, can't give hints.")
+            else:
+                if hint_giver.show_taken_hints("level" + str(game.level), game.branch) != []:
+                    print("Hints taken in current level:")
+                    for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
+                        print("{}: {}".format(hint, hint_giver.take_hint("level" + str(game.level), game.branch, hint)))
+                print("Choose which hint to take:")
+                print("0: (cancel, take no hint)")
+                i = 1
+                possible_hints = hint_giver.show_possible_hints("level" + str(game.level), game.branch)
+                for hint in possible_hints:
+                    print("{}: {}".format(i, hint))
+                    i += 1
+                hint = input()
+                try:
+                    hint = int(hint)
+                    if hint == 0:
+                        print("0 selected, no hint taken.")
+                    elif hint >= i:
+                        print("Number too high selected, no hint taken.")
+                    else:
+                        print("{}: {}".format(hint, hint_giver.take_hint(
+                                    "level" + str(game.level), game.branch, possible_hints[hint-1])))
+                except ValueError:
+                    print("Invalid input, no hint taken.")
         else:
             print("Unknown command. Enter another command or try (H)elp.")
 
