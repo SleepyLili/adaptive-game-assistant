@@ -147,17 +147,7 @@ class Game:
         self.level_start_time = time.time()
 
     def abort_game(self):
-        """Abort game and reset attributes to their default state.
-
-        If a /logs subfolder exists, also logs the current game log
-        to a file before aborting."""
-        try:
-            if os.path.isdir("logs"):
-                self.log_to_file("logs/aborted_game" + str(time.time()))
-        except OSError as err:
-            # print("Failed to save game log.")
-            # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
-            pass
+        """Abort game and reset attributes to their default state."""
         subprocess.run(["vagrant", "destroy", "-f"], cwd=self.game_directory)
         self.load_times = []
         self.solving_times = []

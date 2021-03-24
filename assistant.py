@@ -5,6 +5,7 @@ from adaptive_game_module.hint_giver import HintGiver
 
 import subprocess
 import os
+import time
 
 def print_help():
     """Print list of arguments that game_loop accepts."""
@@ -88,6 +89,34 @@ def write_log(filename, game, hint_giver):
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
         print("Double check that location {} for the file exists and can be written to.".format(filename))
 
+def give_hint(game, hint_giver):
+    if not game.game_in_progress:
+        print("Game not started, can't give hints.")
+        return
+    if hint_giver.show_taken_hints("level" + str(game.level), game.branch) != []:
+        print("Hints taken in current level:")
+        for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
+            print("{}: {}".format(hint, hint_giver.take_hint("level" + str(game.level), game.branch, hint)))
+    print("Choose which hint to take:")
+    print("0: (cancel, take no hint)")
+    i = 1
+    possible_hints = hint_giver.show_possible_hints("level" + str(game.level), game.branch)
+    for hint in possible_hints:
+        print("{}: {}".format(i, hint))
+        i += 1
+    hint = input()
+    try:
+        hint = int(hint)
+        if hint == 0:
+            print("0 selected, no hint taken.")
+        elif hint >= i:
+            print("Number too high selected, no hint taken.")
+        else:
+            print("{}: {}".format(hint, hint_giver.take_hint(
+                        "level" + str(game.level), game.branch, possible_hints[hint-1])))
+    except ValueError:
+        print("Invalid input, no hint taken.")
+
 def game_loop():
     """Interactively assist the player with playing the game.
 
@@ -133,8 +162,16 @@ def game_loop():
         command = input()
         command = command.lower()
         if command in ("a", "abort"):
+            try:
+                if os.path.isdir("logs"):
+                    write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
+            except OSError as err:
+                # print("Failed to save game log.")
+                # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+                pass    
             print("Aborting game, deleting all VMs.")
             game.abort_game()
+            hint_giver.restart_game()
             print("Game aborted, progress reset, VMs deleted.")
         elif command in ("e", "exit"):
             print("Going to exit assistant, abort game and delete VMs.")
@@ -200,6 +237,8 @@ def game_loop():
                 confirmation = confirmation.lower()
                 if (confirmation == "yes"):
                     print("Overwriting file...")
+                    with open("logs/game_log.yml", 'w'): 
+                        pass
                     write_log("logs/game_log.yml", game, hint_giver)
                 else:
                     print("File not overwritten.")
@@ -207,32 +246,7 @@ def game_loop():
                 print("Writing file...")
                 write_log("logs/game_log.yml", game, hint_giver)
         elif command in ("t", "hint"):
-            if not game.game_in_progress:
-                print("Game not started, can't give hints.")
-            else:
-                if hint_giver.show_taken_hints("level" + str(game.level), game.branch) != []:
-                    print("Hints taken in current level:")
-                    for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
-                        print("{}: {}".format(hint, hint_giver.take_hint("level" + str(game.level), game.branch, hint)))
-                print("Choose which hint to take:")
-                print("0: (cancel, take no hint)")
-                i = 1
-                possible_hints = hint_giver.show_possible_hints("level" + str(game.level), game.branch)
-                for hint in possible_hints:
-                    print("{}: {}".format(i, hint))
-                    i += 1
-                hint = input()
-                try:
-                    hint = int(hint)
-                    if hint == 0:
-                        print("0 selected, no hint taken.")
-                    elif hint >= i:
-                        print("Number too high selected, no hint taken.")
-                    else:
-                        print("{}: {}".format(hint, hint_giver.take_hint(
-                                    "level" + str(game.level), game.branch, possible_hints[hint-1])))
-                except ValueError:
-                    print("Invalid input, no hint taken.")
+            give_hint(game, hint_giver)
         else:
             print("Unknown command. Enter another command or try (H)elp.")
 

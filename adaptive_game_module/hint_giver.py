@@ -34,6 +34,10 @@ class HintGiver:
             return True
         return False
 
+    def restart_game(self):
+        self.total_hints_taken = 0
+        self.hints_taken = {}
+    
     def log_to_file(self, filename):
         with open(filename, 'a') as f:
             yaml.dump(self, f)
