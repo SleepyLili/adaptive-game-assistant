@@ -16,6 +16,7 @@ def print_help():
     print("(S)tart  - starts a new run of the adaptive game, if one isn't in progress.")
     print("(N)ext   - advances to the next level. Asks for branch when applicable.")
     print("(F)inish - when on the last level, finishes the game and logs end time.")
+    print("hin(T)   - ask for hints, read previously given hints.")
     print("(I)nfo   - displays info about current run - Level number and name.")
     print("(L)og    - log (save) the information about the game into a file.")
     print("Helper functions:")
@@ -129,12 +130,14 @@ def game_loop():
     (E)xit   - aborts run, then exits the assistant.
     (S)tart  - starts a new run of the adaptive game, if one isn't in progress.
     (N)ext   - advances to the next level. Asks for branch when applicable.
+    hin(T)   - ask for hints, read previously given hints.
     (F)inish - when on the last level, finishes the game and logs end time.
     (I)nfo   - displays info about current run - Level number and name.
     (L)og    - log (save) the information about the game into a file.
     Helper functions:
     (H)elp   - explains all commands on the screen.
     (C)heck  - checks if prerequisites to run the game are installed.
+
     """
 
     if not os.path.isdir("logs"):
@@ -147,18 +150,25 @@ def game_loop():
             print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
             print("If not fixed, saving game data might not be possible.")
     try:
-        game = Game("levels.yml", "../game")
+        game = Game("resources/levels.yml", "../game")
     except OSError as err:
         print("Error encountered while setting up the game object.")
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
-        print("(Most likely, `levels.yml` file couldn't be read.")
+        print("(Most likely, `resources/levels.yml` file couldn't be read.")
         print("Make sure it is in the folder, and readable.")
-    hint_giver = HintGiver("resources/hints.yml")
+    try:
+        hint_giver = HintGiver("resources/hints.yml")
+    except OSError as err:
+        print("Error encountered while setting up the hint giver.")
+        print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        print("(Most likely, `resources/hints.yml` file couldn't be read.")
+        print("Make sure it is in the folder, and readable.")
+    
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
     while True:
-        print("Waiting for next input:")
+        print("Waiting for your input:")
         command = input()
         command = command.lower()
         if command in ("a", "abort"):
@@ -212,7 +222,6 @@ def game_loop():
                     print("Make sure to run (F)inish and (L)og your progress before exiting.")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
-
         elif command in ("f", "finish"):
             if game.finish_game():
                 print("Game finished, total time saved!")
