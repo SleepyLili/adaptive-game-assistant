@@ -2,6 +2,7 @@
 
 from adaptive_game_module.adaptive_game import Game
 from adaptive_game_module.hint_giver import HintGiver
+from adaptive_game_module.level_selector import LevelSelector
 
 import subprocess
 import os
@@ -118,6 +119,48 @@ def give_hint(game, hint_giver):
     except ValueError:
         print("Invalid input, no hint taken.")
 
+def starting_quiz(level_selector):
+    print("Before the game starts, a little quiz:")
+    print("to better know your skills.")
+    print("Please answer 'yes' if you have ever used a tool or skill before,")
+    print("or 'no' if you haven't.")
+    for tool in level_selector.tool_list:
+        unanswered = True
+        while (unanswered):
+            print("Are you familiar with {}?".format(tool))
+            command = input()
+            command = command.lower()
+            if command in ("y", "yes"):
+                level_selector.add_known_tool(tool)
+                unanswered = False
+            elif command in ("n", "no"):
+                unanswered = False
+            elif command in ("exit", "stop"):
+                return False
+            else:
+                print("Answer has to be 'yes' or 'no' (or 'exit')")
+                unanswered = True
+    return True
+
+def start_game(game, level_selector):
+    print("Before the game starts, please fill in a little quiz.")
+    print("It will help better decide what levels you will play.")
+    confirmation = starting_quiz(level_selector)
+    if not confirmation:
+        print("Game not started, quiz not filled in.")
+        return
+    print("Quiz filled in!")
+    print("Starting the game.")
+    print("The initial setup may take a while, up to 20 minutes.")
+    if game.start_game():
+        print("If you do not see any error messages above,")
+        print("then the game was started succesfully!")
+        print("You can start playing now.")
+    else:
+        print("Game was not started, it's already in progress!")
+        print("To start over, please run `abort` first.")
+
+
 def game_loop():
     """Interactively assist the player with playing the game.
 
@@ -163,11 +206,19 @@ def game_loop():
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
         print("(Most likely, `resources/hints.yml` file couldn't be read.")
         print("Make sure it is in the folder, and readable.")
+    try:
+        level_selector = LevelSelector("resources/tools.yml", "resources/level_requirements.yml")
+    except OSError as err:
+        print("Error encountered while setting up the level selector.")
+        print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        print("(Most likely, `resources/level_requirements.yml` file couldn't be read.")
+        print("Make sure it is in the folder, and readable.")
     
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
     while True:
+        print("Current running time: {}m".format(game.running_time()))
         print("Waiting for your input:")
         command = input()
         command = command.lower()
@@ -189,15 +240,7 @@ def game_loop():
             print("Exiting...")
             return
         elif command in ("s", "start"):
-            print("Trying to start the game.")
-            print("The initial setup may take a while, up to 20 minutes.")
-            if game.start_game():
-                print("If you do not see any error messages above,")
-                print("then the game was started succesfully!")
-                print("You can start playing now.")
-            else:
-                print("Game was not started, it's already in progress!")
-                print("To start over, please run `abort` first.")
+            start_game(game, level_selector)
         elif command in ("n", "next"):
             try:
                 if game.level == 0:
@@ -206,6 +249,8 @@ def game_loop():
                     print("Going to set up level {}".format(game.level + 1))
                     if game.next_level_is_forked():
                         print("Next level is forked.")
+                        print("Recommended next level: {}".format(
+                                level_selector.next_level(game.level, game.running_time())))
                         game.print_next_level_fork_names()
                         print("Choose level's branch:")
                         branch = input()

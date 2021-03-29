@@ -158,6 +158,13 @@ class Game:
         self.game_finished = False
         self.level = 0
         self.branch = ''
+
+    def running_time(self):
+        """Return running time in minutes."""
+        current_time = time.time()
+        total_time_seconds = int(current_time - self.game_start_time)
+        return int(total_time_seconds/60)
+
     # # # METHODS THAT WORK WITH FILES # # #
     def read_mapping(self, filename): # raise OSError when file can't be opened
         """Read a mapping of levels for the adaptive game from a YAML file."""
