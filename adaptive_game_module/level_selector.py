@@ -1,4 +1,4 @@
-import yaml  # reads hint configurations from a .yml file
+import yaml
 
 class LevelSelector:
     """Class handling selection of next level to play, in player's place.
