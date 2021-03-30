@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from adaptive_game_module.adaptive_game import Game
+from adaptive_game_module.adaptive_game import Game, NoLevelFoundError
 from adaptive_game_module.hint_giver import HintGiver
 from adaptive_game_module.level_selector import LevelSelector
+from adaptive_game_module.flag_checker import FlagChecker
 
 import subprocess
 import os
@@ -80,12 +81,13 @@ def check_prerequisites():
         else:
             print("NOK, VirtualBox version lower than 6 detected.")
 
-def write_log(filename, game, hint_giver):
+def write_log(filename, game, hint_giver, flag_checker):
     """Write log from `game` and `hint_giver` to file `filename`
     Calls logging methods, which are just yaml dumps."""
     try:
         game.log_to_file(filename)
         hint_giver.log_to_file(filename)
+        flag_checker.log_to_file(filename)
     except OSError:
         print("Error encountered while saving game data:")
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
@@ -161,11 +163,11 @@ def start_game(game, level_selector):
         print("Game was not started, it's already in progress!")
         print("To start over, please run `abort` first.")
 
-def abort_game(game, hint_giver):
+def abort_game(game, hint_giver, flag_checker):
     """Abort the game and reset all progress, log current game in a file."""
     try:
         if os.path.isdir("logs"):
-            write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
+            write_log("logs/aborted_game" + str(time.time()), game, hint_giver, flag_checker)
     except OSError as err:
         # print("Failed to save game log.")
         # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
@@ -175,7 +177,7 @@ def abort_game(game, hint_giver):
     hint_giver.restart_game()
     print("Game aborted, progress reset, VMs deleted.")
 
-def player_logging(game, hint_giver):
+def player_logging(game, hint_giver, flag_checker):
     """Player-initiated log of the game. Always saves to logs/game_log.yml"""
     if os.path.exists("logs/game_log.yml"):
         print("It appears that there is already a saved game log.")
@@ -186,12 +188,12 @@ def player_logging(game, hint_giver):
             print("Overwriting file...")
             with open("logs/game_log.yml", 'w'): 
                 pass
-            write_log("logs/game_log.yml", game, hint_giver)
+            write_log("logs/game_log.yml", game, hint_giver, flag_checker)
         else:
             print("File not overwritten.")
     else:
         print("Writing file...")
-        write_log("logs/game_log.yml", game, hint_giver)
+        write_log("logs/game_log.yml", game, hint_giver, flag_checker)
 
 def finish_game(game):
     """Mark game as finished, inform player if that's impossible."""
@@ -204,6 +206,34 @@ def finish_game(game):
     else:
         print("Could not finish game.")
         print("Make sure you are on the last level!")
+
+def try_next_level(game, level_selector):
+    if game.next_level_exists():
+        print("Going to set up level {}".format(game.level + 1))
+        if game.next_level_is_forked():
+            next_level = level_selector.next_level(game.level, game.running_time())
+            print("Setting up next level: {}".format(next_level))
+            game.next_level(next_level)
+        else:
+            game.next_level()
+        print("Level deployed.")
+        print("If you don't see any errors above, you can continue playing.")
+        if game.level == 5:  # TODO: maybe remove hardcode
+            print("This is the last level of the game.")
+    else:
+        print("No next levels found -- you finished the game!")
+        print("Make sure to run (F)inish and (L)og your progress before exiting.")
+
+def check_flag(level, flag_checker):
+    print("To continue, please enter the flag you found:")
+    print("(case sensitive)")
+    flag = input()
+    if flag_checker.check_flag("level"+str(level), flag):
+        print("Flag is correct!")
+        return True
+    print("Flag is incorrect.")
+    print("Double check your spelling, or use hints if you don't know how to proceed.")
+    return False
 
 def game_loop():
     """Interactively assist the player with playing the game.
@@ -255,7 +285,15 @@ def game_loop():
         print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
         print("(Most likely, `resources/level_requirements.yml` file couldn't be read.")
         print("Make sure it is in the folder, and readable.")
-    
+    try:
+        flag_checker = FlagChecker("resources/level_keys.yml")
+    except OSError as err:
+        print("Error encountered while setting up the flag checker.")
+        print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        # print("(Most likely, `resources/level_requirements.yml` file couldn't be read.")
+        # print("Make sure it is in the folder, and readable.")
+
+
     print("Welcome to the adaptive game assistant.")
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
@@ -264,9 +302,9 @@ def game_loop():
         command = input()
         command = command.lower()
         if command in ("a", "abort", "(a)bort"):
-            abort_game(game, hint_giver)
+            abort_game(game, hint_giver, flag_checker)
         elif command in ("e", "exit"):
-            abort_game(game, hint_giver)
+            abort_game(game, hint_giver, flag_checker)
             print("Exiting...")
             return
         elif command in ("s", "start", "(s)tart"):
@@ -275,21 +313,12 @@ def game_loop():
             try:
                 if game.level == 0:
                     print("Can't continue, (S)tart the game first!")
-                elif game.next_level_exists():
-                    print("Going to set up level {}".format(game.level + 1))
-                    if game.next_level_is_forked():
-                        next_level = level_selector.next_level(game.level, game.running_time())
-                        print("Setting up next level: {}".format(next_level))
-                        game.next_level(next_level)
-                    else:
-                        game.next_level()
-                    print("Level deployed.")
-                    print("If you don't see any errors above, you can continue playing.")
-                    if game.level == 5:  # TODO: maybe remove hardcode
-                        print("This is the last level of the game.")
-                else:
-                    print("No next levels found -- you finished the game!")
+                elif game.level == 5:
+                    print("Can't continue, you are on the last level!")
                     print("Make sure to run (F)inish and (L)og your progress before exiting.")
+                else:
+                    if check_flag(game.level, flag_checker):
+                        try_next_level(game, level_selector)
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
         elif command in ("f", "finish", "(f)inish"):
@@ -301,7 +330,7 @@ def game_loop():
         elif command in ("c", "check", "(c)heck"):
             check_prerequisites()
         elif command in ("l", "log", "(l)og"):
-            player_logging(game, hint_giver)
+            player_logging(game, hint_giver, flag_checker)
         elif command in ("t", "hint", "hin(t)"):
             give_hint(game, hint_giver)
         else:
