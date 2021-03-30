@@ -260,7 +260,6 @@ def game_loop():
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
     while True:
-        print("Current running time: {}m".format(game.running_time()))
         print("Waiting for your input:")
         command = input()
         command = command.lower()
