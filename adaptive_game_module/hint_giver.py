@@ -2,7 +2,9 @@ import yaml  # reads hint configurations from a .yml file
 
 class HintGiver:
     """Class holding all the possible hints for all levels, and giving them
-    out when asked for."""
+    out when asked for.
+    
+    Also keeps track of previously given hints, and total given hints in a game."""
 
     def __init__(self, hint_filename):
         """Create a hint giver from file `filename`."""
