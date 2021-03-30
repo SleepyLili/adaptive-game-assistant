@@ -52,4 +52,4 @@ class HintGiver:
     def log_to_file(self, filename):
         """Write taken hints to a file."""
         with open(filename, 'a') as f:
-            yaml.dump(self, f)
+            yaml.dump(self.hints_taken, f)

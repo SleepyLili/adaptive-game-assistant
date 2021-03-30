@@ -100,7 +100,7 @@ def give_hint(game, hint_giver):
         print("Hints taken in current level:")
         for hint in hint_giver.show_taken_hints("level" + str(game.level), game.branch):
             print("{}: {}".format(hint, hint_giver.take_hint("level" + str(game.level), game.branch, hint)))
-    print("Choose which hint to take:")
+    print("Choose which hint to take (Write a number):")
     print("0: (cancel, take no hint)")
     i = 1
     possible_hints = hint_giver.show_possible_hints("level" + str(game.level), game.branch)
