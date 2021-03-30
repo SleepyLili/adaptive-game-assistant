@@ -260,15 +260,15 @@ def game_loop():
         print("Waiting for your input:")
         command = input()
         command = command.lower()
-        if command in ("a", "abort"):
+        if command in ("a", "abort", "(a)bort"):
             abort_game(game, hint_giver)
         elif command in ("e", "exit"):
             abort_game(game, hint_giver)
             print("Exiting...")
             return
-        elif command in ("s", "start"):
+        elif command in ("s", "start", "(s)tart"):
             start_game(game, level_selector)
-        elif command in ("n", "next"):
+        elif command in ("n", "next", "(n)ext"):
             try:
                 if game.level == 0:
                     print("Can't continue, (S)tart the game first!")
@@ -290,17 +290,17 @@ def game_loop():
                     print("Make sure to run (F)inish and (L)og your progress before exiting.")
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
-        elif command in ("f", "finish"):
+        elif command in ("f", "finish", "(f)inish"):
             finish_game(game)
-        elif command in ("i", "info", "information"):
+        elif command in ("i", "info", "information", "(i)nfo", "(i)nformation"):
             game.print_info()
-        elif command in ("h", "help"):
+        elif command in ("h", "help", "(h)elp"):
             print_help()
-        elif command in ("c", "check"):
+        elif command in ("c", "check", "(c)heck"):
             check_prerequisites()
-        elif command in ("l", "log"):
+        elif command in ("l", "log", "(l)og"):
             write_log(game, hint_giver)
-        elif command in ("t", "hint"):
+        elif command in ("t", "hint", "hin(t)"):
             give_hint(game, hint_giver)
         else:
             print("Unknown command. Enter another command or try (H)elp.")
