@@ -87,13 +87,11 @@ class Game:
 
     def next_level_exists(self):
         """Return true if next level exists."""
-
         next_level = "level" + str(self.level + 1)
         return next_level in self.level_mapping
 
     def next_level_is_forked(self):
         """Return true if next level is forked."""
-
         next_level = "level" + str(self.level + 1)
         if next_level in self.level_mapping:
             if len(self.level_mapping[next_level]) > 1:

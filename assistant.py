@@ -10,7 +10,6 @@ import time
 
 def print_help():
     """Print list of arguments that game_loop accepts."""
-
     print("Functions that control the game:")
     print("(A)bort  - destroys all VMs, resets progress to level 0.")
     print("(E)xit   - aborts run, then exits the assistant.")
@@ -29,7 +28,6 @@ def check_prerequisites():
     """Check for the right version of required tools and print the result.
 
     VirtualBox check fails on windows even when VirtualBox is present."""
-
     print("checking Python version:")
     found = True
     try:
@@ -84,7 +82,6 @@ def check_prerequisites():
 
 def write_log(filename, game, hint_giver):
     """Write log from `game` and `hint_giver` to file `filename`
-    
     Calls logging methods, which are just yaml dumps."""
     try:
         game.log_to_file(filename)
@@ -96,7 +93,6 @@ def write_log(filename, game, hint_giver):
 
 def give_hint(game, hint_giver):
     """Recap previously given hints, and give player another hint if they want."""
-
     if not game.game_in_progress:
         print("Game not started, can't give hints.")
         return
@@ -126,7 +122,6 @@ def give_hint(game, hint_giver):
 
 def starting_quiz(level_selector):
     """Ask the player a few questions, saving known tools to level selector."""
-
     print("Please answer 'yes' if you have ever used a tool or skill before,")
     print("or 'no' if you haven't.")
     for tool in level_selector.tool_list:
@@ -149,7 +144,6 @@ def starting_quiz(level_selector):
 
 def start_game(game, level_selector):
     """Start the game through the game object after doing a starting quiz."""
-
     print("Before the game starts, please fill in a little quiz.")
     print("It will help better decide what levels you will play.")
     confirmation = starting_quiz(level_selector)
@@ -169,7 +163,6 @@ def start_game(game, level_selector):
 
 def abort_game(game, hint_giver):
     """Abort the game and reset all progress, log current game in a file."""
-
     try:
         if os.path.isdir("logs"):
             write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
@@ -184,7 +177,6 @@ def abort_game(game, hint_giver):
 
 def player_logging(game, hint_giver):
     """Player-initiated log of the game. Always saves to logs/game_log.yml"""
-
     if os.path.exists("logs/game_log.yml"):
         print("It appears that there is already a saved game log.")
         print("Write 'yes' to overwrite it.")
@@ -203,7 +195,6 @@ def player_logging(game, hint_giver):
 
 def finish_game(game):
     """Mark game as finished, inform player if that's impossible."""
-
     if game.finish_game():
         print("Game finished, total time saved!")
     elif (not game.game_in_progress and not game.game_finished):
@@ -233,9 +224,7 @@ def game_loop():
     Helper functions:
     (H)elp   - explains all commands on the screen.
     (C)heck  - checks if prerequisites to run the game are installed.
-
     """
-
     if not os.path.isdir("logs"):
         try:
             os.mkdir("logs")
