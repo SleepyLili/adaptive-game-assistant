@@ -120,8 +120,6 @@ def give_hint(game, hint_giver):
         print("Invalid input, no hint taken.")
 
 def starting_quiz(level_selector):
-    print("Before the game starts, a little quiz:")
-    print("to better know your skills.")
     print("Please answer 'yes' if you have ever used a tool or skill before,")
     print("or 'no' if you haven't.")
     for tool in level_selector.tool_list:
@@ -160,6 +158,46 @@ def start_game(game, level_selector):
         print("Game was not started, it's already in progress!")
         print("To start over, please run `abort` first.")
 
+def abort_game(game, hint_giver):
+    try:
+        if os.path.isdir("logs"):
+            write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
+    except OSError as err:
+        # print("Failed to save game log.")
+        # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
+        pass    
+    print("Aborting game, deleting all VMs.")
+    game.abort_game()
+    hint_giver.restart_game()
+    print("Game aborted, progress reset, VMs deleted.")
+
+def write_log(game, hint_giver):
+    if os.path.exists("logs/game_log.yml"):
+        print("It appears that there is already a saved game log.")
+        print("Write 'yes' to overwrite it.")
+        confirmation = input()
+        confirmation = confirmation.lower()
+        if (confirmation == "yes"):
+            print("Overwriting file...")
+            with open("logs/game_log.yml", 'w'): 
+                pass
+            write_log("logs/game_log.yml", game, hint_giver)
+        else:
+            print("File not overwritten.")
+    else:
+        print("Writing file...")
+        write_log("logs/game_log.yml", game, hint_giver)
+
+def finish_game(game):
+    if game.finish_game():
+        print("Game finished, total time saved!")
+    elif (not game.game_in_progress and not game.game_finished):
+        print("Can't finish game, game was not started yet.")
+    elif (not game.game_in_progress and game.game_finished):
+        print("Can't finish game, game was already finished earlier.")
+    else:
+        print("Could not finish game.")
+        print("Make sure you are on the last level!")
 
 def game_loop():
     """Interactively assist the player with playing the game.
@@ -223,20 +261,9 @@ def game_loop():
         command = input()
         command = command.lower()
         if command in ("a", "abort"):
-            try:
-                if os.path.isdir("logs"):
-                    write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
-            except OSError as err:
-                # print("Failed to save game log.")
-                # print("Error number: {}, Error text: {}".format(err.errno, err.strerror))
-                pass    
-            print("Aborting game, deleting all VMs.")
-            game.abort_game()
-            hint_giver.restart_game()
-            print("Game aborted, progress reset, VMs deleted.")
+            abort_game(game, hint_giver)
         elif command in ("e", "exit"):
-            print("Going to exit assistant, abort game and delete VMs.")
-            game.abort_game()
+            abort_game(game, hint_giver)
             print("Exiting...")
             return
         elif command in ("s", "start"):
@@ -248,14 +275,10 @@ def game_loop():
                 elif game.next_level_exists():
                     print("Going to set up level {}".format(game.level + 1))
                     if game.next_level_is_forked():
-                        print("Next level is forked.")
-                        print("Recommended next level: {}".format(
-                                level_selector.next_level(game.level, game.running_time())))
-                        game.print_next_level_fork_names()
-                        print("Choose level's branch:")
-                        branch = input()
-                        branch = branch.lower()
-                        game.next_level(branch)
+                        # print("Next level is forked.")
+                        next_level = level_selector.next_level(game.level, game.running_time())
+                        print("Setting up next level: {}".format(next_level))
+                        game.next_level(next_level)
                     else:
                         game.next_level()
                     print("Level deployed.")
@@ -268,15 +291,7 @@ def game_loop():
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
         elif command in ("f", "finish"):
-            if game.finish_game():
-                print("Game finished, total time saved!")
-            elif (not game.game_in_progress and not game.game_finished):
-                print("Can't finish game, game was not started yet.")
-            elif (not game.game_in_progress and game.game_finished):
-                print("Can't finish game, game was already finished earlier.")
-            else:
-                print("Could not finish game.")
-                print("Make sure you are on the last level!")
+            finish_game(game)
         elif command in ("i", "info", "information"):
             game.print_info()
         elif command in ("h", "help"):
@@ -284,21 +299,7 @@ def game_loop():
         elif command in ("c", "check"):
             check_prerequisites()
         elif command in ("l", "log"):
-            if os.path.exists("logs/game_log.yml"):
-                print("It appears that there is already a saved game log.")
-                print("Write 'yes' to overwrite it.")
-                confirmation = input()
-                confirmation = confirmation.lower()
-                if (confirmation == "yes"):
-                    print("Overwriting file...")
-                    with open("logs/game_log.yml", 'w'): 
-                        pass
-                    write_log("logs/game_log.yml", game, hint_giver)
-                else:
-                    print("File not overwritten.")
-            else:
-                print("Writing file...")
-                write_log("logs/game_log.yml", game, hint_giver)
+            write_log(game, hint_giver)
         elif command in ("t", "hint"):
             give_hint(game, hint_giver)
         else:
