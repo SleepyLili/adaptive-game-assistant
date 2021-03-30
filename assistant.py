@@ -275,7 +275,6 @@ def game_loop():
                 elif game.next_level_exists():
                     print("Going to set up level {}".format(game.level + 1))
                     if game.next_level_is_forked():
-                        # print("Next level is forked.")
                         next_level = level_selector.next_level(game.level, game.running_time())
                         print("Setting up next level: {}".format(next_level))
                         game.next_level(next_level)
