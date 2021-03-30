@@ -15,10 +15,10 @@ def print_help():
     print("(A)bort  - destroys all VMs, resets progress to level 0.")
     print("(E)xit   - aborts run, then exits the assistant.")
     print("(S)tart  - starts a new run of the adaptive game, if one isn't in progress.")
-    print("(N)ext   - advances to the next level. Asks for branch when applicable.")
+    print("(N)ext   - advances to the next level.")
     print("(F)inish - when on the last level, finishes the game and logs end time.")
     print("hin(T)   - ask for hints, read previously given hints.")
-    print("(I)nfo   - displays info about current run - Level number and name.")
+    print("(I)nfo   - displays info about current game - levels traversed, times...")
     print("(L)og    - log (save) the information about the game into a file.")
     print("Helper functions:")
     print("(H)elp   - explains all commands on the screen.")
@@ -83,6 +83,9 @@ def check_prerequisites():
             print("NOK, VirtualBox version lower than 6 detected.")
 
 def write_log(filename, game, hint_giver):
+    """Write log from `game` and `hint_giver` to file `filename`
+    
+    Calls logging methods, which are just yaml dumps."""
     try:
         game.log_to_file(filename)
         hint_giver.log_to_file(filename)
@@ -92,6 +95,8 @@ def write_log(filename, game, hint_giver):
         print("Double check that location {} for the file exists and can be written to.".format(filename))
 
 def give_hint(game, hint_giver):
+    """Recap previously given hints, and give player another hint if they want."""
+
     if not game.game_in_progress:
         print("Game not started, can't give hints.")
         return
@@ -120,6 +125,8 @@ def give_hint(game, hint_giver):
         print("Invalid input, no hint taken.")
 
 def starting_quiz(level_selector):
+    """Ask the player a few questions, saving known tools to level selector."""
+
     print("Please answer 'yes' if you have ever used a tool or skill before,")
     print("or 'no' if you haven't.")
     for tool in level_selector.tool_list:
@@ -141,6 +148,8 @@ def starting_quiz(level_selector):
     return True
 
 def start_game(game, level_selector):
+    """Start the game through the game object after doing a starting quiz."""
+
     print("Before the game starts, please fill in a little quiz.")
     print("It will help better decide what levels you will play.")
     confirmation = starting_quiz(level_selector)
@@ -159,6 +168,8 @@ def start_game(game, level_selector):
         print("To start over, please run `abort` first.")
 
 def abort_game(game, hint_giver):
+    """Abort the game and reset all progress, log current game in a file."""
+
     try:
         if os.path.isdir("logs"):
             write_log("logs/aborted_game" + str(time.time()), game, hint_giver)
@@ -171,7 +182,9 @@ def abort_game(game, hint_giver):
     hint_giver.restart_game()
     print("Game aborted, progress reset, VMs deleted.")
 
-def write_log(game, hint_giver):
+def player_logging(game, hint_giver):
+    """Player-initiated log of the game. Always saves to logs/game_log.yml"""
+
     if os.path.exists("logs/game_log.yml"):
         print("It appears that there is already a saved game log.")
         print("Write 'yes' to overwrite it.")
@@ -189,6 +202,8 @@ def write_log(game, hint_giver):
         write_log("logs/game_log.yml", game, hint_giver)
 
 def finish_game(game):
+    """Mark game as finished, inform player if that's impossible."""
+
     if game.finish_game():
         print("Game finished, total time saved!")
     elif (not game.game_in_progress and not game.game_finished):
@@ -210,10 +225,10 @@ def game_loop():
     (A)bort  - destroys all VMs, resets progress to level 0.
     (E)xit   - aborts run, then exits the assistant.
     (S)tart  - starts a new run of the adaptive game, if one isn't in progress.
-    (N)ext   - advances to the next level. Asks for branch when applicable.
+    (N)ext   - advances to the next level.
     hin(T)   - ask for hints, read previously given hints.
     (F)inish - when on the last level, finishes the game and logs end time.
-    (I)nfo   - displays info about current run - Level number and name.
+    (I)nfo   - displays info about current game - levels traversed, times...
     (L)og    - log (save) the information about the game into a file.
     Helper functions:
     (H)elp   - explains all commands on the screen.
@@ -298,7 +313,7 @@ def game_loop():
         elif command in ("c", "check", "(c)heck"):
             check_prerequisites()
         elif command in ("l", "log", "(l)og"):
-            write_log(game, hint_giver)
+            player_logging(game, hint_giver)
         elif command in ("t", "hint", "hin(t)"):
             give_hint(game, hint_giver)
         else:
