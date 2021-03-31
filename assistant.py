@@ -322,8 +322,13 @@ def game_loop():
             except NoLevelFoundError as err:
                 print("Error encountered: {}".format(err))
         elif command in ("f", "finish", "(f)inish"):
-            if check_flag(game.level, flag_checker):
-                finish_game(game)
+            if (not game.game_in_progress and not game.game_finished):
+                print("Can't finish game, game was not started yet.")
+            elif (not game.game_in_progress and game.game_finished):
+                print("Can't finish game, game was already finished earlier.")
+            else:
+                if check_flag(game.level, flag_checker):
+                    finish_game(game)
         elif command in ("i", "info", "information", "(i)nfo", "(i)nformation"):
             game.print_info()
         elif command in ("h", "help", "(h)elp"):
