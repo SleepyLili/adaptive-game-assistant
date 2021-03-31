@@ -1,6 +1,8 @@
 ---
 - metamask
 - SQL injection
+- webshell
 - nmap
 - John the Ripper
+- dnschef
 ...
