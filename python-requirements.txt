@@ -1,2 +1,2 @@
 # Python installation requirements
-pyyaml
+pyyaml>=5.1
