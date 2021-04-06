@@ -39,7 +39,7 @@ def check_prerequisites():
     if found:
         version_number = version.stdout.split(" ", 1)[1].split(".")
         if version_number[0] == "3":
-            if int(version_number[1]) > 7:
+            if int(version_number[1]) >= 7:
                 print("OK, Python version higher than 3.7.")
             else:
                 print("NOK, Python version lower than 3.7.")
