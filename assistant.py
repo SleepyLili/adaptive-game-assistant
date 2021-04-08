@@ -64,10 +64,12 @@ def check_prerequisites():
         version = subprocess.run(["VBoxManage", "--version"], capture_output=True, text=True)
         found = True
     except FileNotFoundError:
+        print("capitalzied vbox not found")
         pass # try no caps
     if not found:
+        print("trying no caps")
         try:
-            version = subprocess.run(["VBoxManage", "--version"], capture_output=True, text=True)
+            version = subprocess.run(["vboxmanage", "--version"], capture_output=True, text=True)
             found = True
         except FileNotFoundError:
             print("Virtualbox not found.")
