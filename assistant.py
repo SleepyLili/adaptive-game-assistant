@@ -48,15 +48,19 @@ def check_prerequisites():
     except FileNotFoundError:
         found = False
         print("NOK, Vagrant not found.")
-    if found:
-        version_number = version.stdout.split(" ", 1)[1].split(".")
-        if version_number[0] == "2":
-            if int(version_number[1]) > 1:
-                print("OK, Vagrant version higher than 2.2.")
+    try:
+        if found:
+            version_number = version.stdout.split(" ", 1)[1].split(".")
+            if version_number[0] == "2":
+                if int(version_number[1]) > 1:
+                    print("OK, Vagrant version higher than 2.2.")
+                else:
+                    print("NOK, Vagrant version lower than 2.2.")
             else:
-                print("NOK, Vagrant version lower than 2.2.")
-        else:
-            print("NOK, Vagrant 2 not detected.")
+                print("NOK, Vagrant 2 not detected.")
+    except IndexError:
+        print("Vagrant was found, but the version string couldn't be parsed.")
+        print("The string in question: {}".format(version.stdout))
 
     found = False
     print("checking Virtualbox version:")
@@ -64,10 +68,8 @@ def check_prerequisites():
         version = subprocess.run(["VBoxManage", "--version"], capture_output=True, text=True)
         found = True
     except FileNotFoundError:
-        print("capitalzied vbox not found")
         pass # try no caps
     if not found:
-        print("trying no caps")
         try:
             version = subprocess.run(["vboxmanage", "--version"], capture_output=True, text=True)
             found = True
