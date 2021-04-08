@@ -7,6 +7,7 @@ from adaptive_game_module.flag_checker import FlagChecker
 
 import subprocess
 import os
+import sys
 import time
 
 def print_help():
@@ -30,22 +31,15 @@ def check_prerequisites():
 
     VirtualBox check fails on windows even when VirtualBox is present."""
     print("checking Python version:")
-    found = True
-    try:
-        version = subprocess.run(["python", "--version"], capture_output=True, text=True)
-    except FileNotFoundError:
-        found = False
-        print("NOK, Python not found.")
-    if found:
-        version_number = version.stdout.split(" ", 1)[1].split(".")
-        if version_number[0] == "3":
-            if int(version_number[1]) >= 7:
-                print("OK, Python version higher than 3.7.")
-            else:
-                print("NOK, Python version lower than 3.7.")
-                print("assistant may not function correctly.")
+    if sys.version_info[0] == 3:
+        if sys.version_info[1] >= 7:
+            print("OK, Python version higher than 3.7.")
         else:
-            print("NOK, Python 3 not detected.")
+            print("NOK, Python version lower than 3.7.")
+            print("Can't check Vagrant and VirtualBox versions.")
+            return
+    else:
+        print("NOK, Python version lower than 3.") # would sooner crash lol
 
     found = True
     print("checking Vagrant version:")
@@ -64,16 +58,22 @@ def check_prerequisites():
         else:
             print("NOK, Vagrant 2 not detected.")
 
-    found = True
+    found = False
     print("checking Virtualbox version:")
     try:
-        version = subprocess.run(["vboxmanage", "--version"], capture_output=True, text=True)
+        version = subprocess.run(["VBoxManage", "--version"], capture_output=True, text=True)
+        found = True
     except FileNotFoundError:
-        found = False
-        print("Virtualbox not found.")
-        print("If you are on Windows, this is probably OK.")
-        print("(You can double check VirtualBox version yourself to be sure)")
-        print("If you are on Linux, you don't have VirtualBox installed, NOK.")
+        pass # try no caps
+    if not found:
+        try:
+            version = subprocess.run(["VBoxManage", "--version"], capture_output=True, text=True)
+            found = True
+        except FileNotFoundError:
+            print("Virtualbox not found.")
+            print("If you are on Windows, this is probably OK.")
+            print("(You can double check VirtualBox version yourself to be sure)")
+            print("If you are on Linux, you don't have VirtualBox installed, NOK.")
     if found:
         version_number = version.stdout.split(".")
         if int(version_number[0]) > 5:
