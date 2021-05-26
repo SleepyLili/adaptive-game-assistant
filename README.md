@@ -1,15 +1,14 @@
 # Adaptive game assistant
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
-The assistant was made as a part of my [bachelor's thesis]().
+The assistant was originally made as a part of my [bachelor's thesis](), then improved
+for the PA197 Secure Network Design course.
 
-This improved version allows was made for the PA197 course.
-
-Unlike the original, this version allows players to play through the game completely on their own.
+Unlike the original assistant, this version allows players to play through the game completely on their own.
 (The original required some input and help from a course instructor).
 
-The games the assistant can run must be made with Vagrant and Ansible (as other games for
-the KYPO Cyber Range). The Ansible playbooks need to have all tasks tagged, and
+The games the assistant can run must be made with Vagrant and Ansible (as other games at KYPO).
+The Ansible playbooks need to have all tasks tagged, and
 there need to be game-specific config files in the `resources/` subfolder.
 
 ## Usage
