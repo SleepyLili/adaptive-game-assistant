@@ -62,7 +62,7 @@ More about the config files and their format is on the wiki: [Config files](http
 ## I want to try out the assistant, but I don't have an adaptive game
 The simplest way to try the assistant out with no access to another adaptive game is:
 
-1. Download the [thesis archive]() of my Adaptive Cybersecurity Games thesis.
+1. Download the [thesis archive](https://is.muni.cz/th/mnrr8/thesis-archive.zip) of my Adaptive Cybersecurity Games thesis.
 2. In the archive, replace the `assistant/` folder with the folder of this repository.
 (The assistant included with the thesis is an earlier version.)
 3. Make sure that the sample files in the `resources/` subfolder are present.
