@@ -25,7 +25,7 @@ Basic assistant commands:
 - hin(T)  - displays hints, offers new hints.
 - (L)og   - saves data from the game into a file.
 
-The project's wiki also has a detailed user guide with examples: [[Assistant guide]]
+The project's wiki also has a detailed user guide with examples: [Assistant guide](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Assistant-guide)
 ## Requirements
 The assistant requires Python 3.7 or higher to run.
 
@@ -36,6 +36,7 @@ The game the assistant sets up will require Vagrant and VirtualBox to be install
 Virtualbox 6.0 or higher and Vagrant 2.2.5 or higher are recommended. 
 (The exact requirements of individual games may differ.)
 
+The wiki has a detailed installation guide: [Installation](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Installation)
 ## Python module structure
 The main file, `assistant.py`, wraps around several classes the `adaptive_game_module` folder,
 and transforms the user's commands into method calls on the objects.
@@ -57,7 +58,7 @@ The needed files are:
 - `level_requirements.yml`
 - `tools.yml`
 
-More about the config files and their format is on the wiki: [[Config files]]
+More about the config files and their format is on the wiki: [Config files](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Config-files)
 ## I want to try out the assistant, but I don't have an adaptive game
 The simplest way to try the assistant out with no access to another adaptive game is:
 
@@ -70,4 +71,4 @@ The assistant should run the game included with my thesis using the sample resou
 The level instructions for that game are included in the `wiki/` subfolder of the thesis archive you downloaded.
 
 ## Troubleshooting
-All known common problems are in the [[troubleshooting]] doc on the repository wiki.
+All known common problems are in the [troubleshooting](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Troubleshooting) doc on the repository wiki.
