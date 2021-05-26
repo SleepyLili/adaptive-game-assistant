@@ -1,5 +1,5 @@
 ---
-# level_name: {branch_name: [machines_to_provision]}
+# level_name: [[branch_name, requirements]]
 level2: [[level2a, null], [level2b, [10, "SQL injection"]]]
 level3: [[level3, null]]
 level4: [[level4a, null], [level4b, [30, "John the Ripper"]]]
