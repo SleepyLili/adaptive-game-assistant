@@ -1,15 +1,16 @@
 # Adaptive game assistant
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
-The assistant was made as a part of my [bachelor's thesis]() for the university's KYPO lab.
-The version of the assistant included in the thesis appendix required 
-that the player get some help from an instructor while playing.
+The assistant was made as a part of my [bachelor's thesis]().
 
-This improved version allows for the player to play through the game completely on their own.
+This improved version allows was made for the PA197 course.
 
-The games the assistant can help with must be made with Vagrant and Ansible (as other games for
+Unlike the original, this version allows players to play through the game completely on their own.
+(The original required some input and help from a course instructor).
+
+The games the assistant can run must be made with Vagrant and Ansible (as other games for
 the KYPO Cyber Range). The Ansible playbooks need to have all tasks tagged, and
-there need to be game-specific config files in the `resources` subfolder.
+there need to be game-specific config files in the `resources/` subfolder.
 
 ## Usage
 The adaptive game assistant is ran by running `./assistant.py` or `python assistant.py` in the project folder.
@@ -40,15 +41,15 @@ Virtualbox 6.0 or higher and Vagrant 2.2.5 or higher are recommended.
 The main file, `assistant.py`, wraps around several classes the `adaptive_game_module` folder,
 and transforms the user's commands into method calls on the objects.
 The adaptive game module contains:
-- `adaptive_game.py`. The `Game` object from this file represents the game itself.
+- `adaptive_game.py`. The `Game` class represents the state of the game.
 - `flag_checker.py`. The `FlagChecker` class checks if flags are correct.
 - `hint_giver.py`. The `HintGiver` class keeps tracks of taken hints and gives new ones.
 - `level_selector.py`. The `LevelSelector` class helps decide which level to go to next.
 
 ### Game config files
-The assistant is written with modularity in mind, so it should support other adaptive games,
-as long as config files for those are written. `assistant.py` looks for config files in the
-`resources/` folder.
+Besides tagged ansible playbooks, each adaptive game needs a few config files to work.
+The config files are mostly YAML lists and dicts.
+`assistant.py` looks for config files in the `resources/` folder.
 
 The needed files are:
 - `levels.yml`
@@ -57,7 +58,7 @@ The needed files are:
 - `level_requirements.yml`
 - `tools.yml`
 
-All of the files should be in YAML. There are sample config files present in the `resources/` folder already.
+There are sample config files present in the `resources/` folder.
 (These are the files I created for the game I used in my thesis.)
 #### levels.yml
 `levels.yml` tells the Game object what possible levels are in the game, what Ansible tags
