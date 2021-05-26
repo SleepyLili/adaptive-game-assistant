@@ -1,7 +1,7 @@
 # Adaptive game assistant
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
-The assistant was originally made as a part of my [bachelor's thesis](), then improved
+The assistant was originally made as a part of my [bachelor's thesis](https://is.muni.cz/th/mnrr8/), then improved
 for the PA197 Secure Network Design course.
 
 Unlike the original assistant, this version allows players to play through the game completely on their own.
@@ -25,7 +25,7 @@ Basic assistant commands:
 - hin(T)  - displays hints, offers new hints.
 - (L)og   - saves data from the game into a file.
 
-The project's wiki also has a detailed user guide with examples: [How to use the assistant]()
+The project's wiki also has a detailed user guide with examples: [[Assistant guide]]
 ## Requirements
 The assistant requires Python 3.7 or higher to run.
 
@@ -57,50 +57,8 @@ The needed files are:
 - `level_requirements.yml`
 - `tools.yml`
 
-There are sample config files present in the `resources/` folder.
-(These are the files I created for the game I used in my thesis.)
-#### levels.yml
-`levels.yml` tells the Game object what possible levels are in the game, what Ansible tags
-are needed for that level, and what machines need changes done.
-
-Each line of the file should be in the the following format:
-
-`level_name: {branch_name: [machines_to_provision]}`
-
-`branch_name` is not just the name of the branch, but also the Ansible tag used to provision the level.
-#### level_keys.yml
-`level_keys.yml` is a dictionary of the level flags for the flag checker.
-
-The keys should be in the following format:
-`level_name: flag`
-#### level_requirements.yml
-`level_requirements.yml` is the list of requirements for the level selector.
-The requirements should be in the following format:
-
-`level_name: [[branch_name, requirements]]`
-
-where `requirements` is either `null` or `[time, tool]`
-
-e.g. `level2: [[level2a, null], [level2b, [10, "SQL injection"]]]`
-`null` requirement means that this is the "default" version of the level.
-`[time, tool]` means that the player must know `tool` and have time less than `time`.
-
-The `tools` are expected to also be listed in `tools.yml`.
-#### tools.yml
-`tools.yml` is a list of tools that the assistant will ask the player about before they play the game.
-
-If the player is familiar with a tool, they may be sent to a harder version of a level by the level selector.
-
-This file may also contain tools that do not appear in the game.
-
-#### hints.yml
-`hints.yml` contains all the hints the player can receive, and should have the following format:
-
-`level_name: level+branch name: hint title: hint text`
-
-As hints are usually long, the sample file uses indentation to make the file better readable.
-
-## I want to try out the assistant, but I don't have an adaptive game.
+More about the config files and their format is on the wiki: [[Config files]]
+## I want to try out the assistant, but I don't have an adaptive game
 The simplest way to try the assistant out with no access to another adaptive game is:
 
 1. Download the [thesis archive]() of my Adaptive Cybersecurity Games thesis.
@@ -112,4 +70,4 @@ The assistant should run the game included with my thesis using the sample resou
 The level instructions for that game are included in the `wiki/` subfolder of the thesis archive you downloaded.
 
 ## Troubleshooting
-All known common problems are in the [Troubleshooting doc]() on the repository wiki.
+All known common problems are in the [[troubleshooting]] doc on the repository wiki.
