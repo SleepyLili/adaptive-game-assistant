@@ -24,7 +24,7 @@ Basic commands:
 - hin(T)  - displays hints, offers new hints.
 - (L)og   - saves data from the game into a file.
 
-The project's wiki also has a detailed user guide with examples: [Assistant guide](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Assistant-guide)
+The project's wiki has a user guide with examples: [Assistant guide](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Assistant-guide)
 ## Requirements
 The assistant requires Python 3.7 or higher to run.
 
@@ -35,7 +35,7 @@ The game the assistant sets up will require Vagrant and VirtualBox to be install
 Virtualbox 6.0 or higher and Vagrant 2.2.5 or higher are recommended. 
 (The exact requirements of individual games may differ.)
 
-The wiki has a detailed installation guide: [Installation](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Installation)
+The wiki has an in-depth installation guide: [Installation](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Installation)
 ## Python module structure
 The main file, `assistant.py` makes use of the files from the `adaptive_game_module/` folder,
 and transforms the user's commands into method calls on the objects.
