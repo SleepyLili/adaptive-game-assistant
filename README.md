@@ -1,22 +1,21 @@
 # Adaptive game assistant
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
-The assistant was originally made as a part of my [bachelor's thesis](https://is.muni.cz/th/mnrr8/), then improved
-for the PA197 Secure Network Design course.
-
-Unlike the original assistant, this version allows players to play through the game completely on their own.
-(The original required some input and help from a course instructor).
+When bundled with a compatible game (and a few config files), the assistant
+allows the user to play through the game independently, with no interference from
+a teacher or a supervisor. It automatically runs Vagrant commands to prepare levels 
+of the game, checks flags when player completes levels and provides hints.
 
 The games the assistant can run must be made with Vagrant and Ansible (as other games at KYPO).
 The Ansible playbooks need to have all tasks tagged, and
 there need to be game-specific config files in the `resources/` subfolder.
 
+The assistant was originally made as a part of my [bachelor's thesis](https://is.muni.cz/th/mnrr8/), then improved
+for a secure network design course.
 ## Usage
 The adaptive game assistant is ran by running `./assistant.py` or `python assistant.py` in the project folder.
-It automatically runs Vagrant commands to prepare levels of the game,
-checks flags when player completes level and provides hints when needed.
 
-Basic assistant commands:
+Basic commands:
 - (S)tart - starts the game from level 1.
 - (N)ext  - continues the game to the next level.
 - (E)xit  - properly ends the game and exits the assistant.
@@ -38,8 +37,9 @@ Virtualbox 6.0 or higher and Vagrant 2.2.5 or higher are recommended.
 
 The wiki has a detailed installation guide: [Installation](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Installation)
 ## Python module structure
-The main file, `assistant.py`, wraps around several classes the `adaptive_game_module` folder,
+The main file, `assistant.py` makes use of the files from the `adaptive_game_module/` folder,
 and transforms the user's commands into method calls on the objects.
+
 The adaptive game module contains:
 - `adaptive_game.py`. The `Game` class represents the state of the game.
 - `flag_checker.py`. The `FlagChecker` class checks if flags are correct.
