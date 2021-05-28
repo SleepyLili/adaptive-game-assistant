@@ -2,16 +2,16 @@
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
 When bundled with a compatible game (and a few config files), the assistant
-allows the user to play through the game independently, with no interference from
-a teacher or a supervisor. It automatically runs Vagrant commands to prepare levels 
+allows the user to play through the game independently, with no help needed from
+a teacher or a supervisor. The assistant automatically runs Vagrant commands to prepare levels 
 of the game, checks flags when player completes levels and provides hints.
+
+The assistant was originally made as a part of my [bachelor's thesis](https://is.muni.cz/th/mnrr8/)
+for the university's KYPO Lab. It was later improved to be used in a university course.
 
 The games the assistant can run must be made with Vagrant and Ansible (as other games at KYPO).
 The Ansible playbooks need to have all tasks tagged, and
 there need to be game-specific config files in the `resources/` subfolder.
-
-The assistant was originally made as a part of my [bachelor's thesis](https://is.muni.cz/th/mnrr8/), then improved
-for a secure network design course.
 ## Usage
 The adaptive game assistant is ran by running `./assistant.py` or `python assistant.py` in the project folder.
 
