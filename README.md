@@ -46,6 +46,12 @@ The adaptive game module contains:
 - `hint_giver.py`. The `HintGiver` class keeps tracks of taken hints and gives new ones.
 - `level_selector.py`. The `LevelSelector` class helps decide which level to go to next.
 
+### Ansible tags
+The assistant expects some things of the Ansible playbooks.
+- All tasks should be tagged
+- Tasks for game setup and the first level are tagged `setup`
+- Tasks for level past the first are in the format `level + [number] + [branch, optional]` i.e. "level3", "level4a"
+
 ### Game config files
 Besides tagged ansible playbooks, each adaptive game needs a few config files to work.
 The config files are mostly YAML lists and dicts.
