@@ -92,7 +92,7 @@ This would be similar to the original assistant prototype, where the user had th
 teacher tell them what branch they were choosing. It would also simplify some testing
 scenarios.
 
-- A "dry run" mode for testing
+- A "dry run mode" for testing
 
 Sometimes, it'd be nice to turn off the assistant's underlying calls to Vagrant,
 to speed up testing of features, config files, etc.
