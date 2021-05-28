@@ -87,23 +87,23 @@ Since the assistant needed to be ready and functional by a deadline,
 there are some features that would have been nice to have, but weren't necessary
 at the moment. Those features include:
 
-- A "manual mode" where the user gets to decide next level
+- **A "manual mode" where the user gets to decide next level**
 
 This would be similar to the original assistant prototype, where the user had the
 teacher tell them what branch they were choosing. It would also simplify some testing
 scenarios.
 
-- A "dry run mode" for testing
+- **A "dry run mode" for testing**
 
 Sometimes, it'd be nice to turn off the assistant's underlying calls to Vagrant,
 to speed up testing of features, config files, etc.
 
-- The ability to turn off certain modules
+- **The ability to turn off certain modules**
 
 In a game without flags, or where flag checking isn't important, the flag
 checker could be turned off, for example.
 
-- Better support for branching levels -- arbitrary names, shorter and longer playthroughs
+- **Better support for branching levels -- arbitrary names, shorter and longer playthroughs**
 
 The assistant as it is right now expects the levels to have a naming convention, and it also expects that for every possible playthrough, there will always be the same number of levels.
 Removing these constraints would make it possible to support games of variable length, or with entire "replacement" branches, etc.
