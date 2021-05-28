@@ -65,7 +65,9 @@ The simplest way to try the assistant out with no access to another adaptive gam
 1. Download the [thesis archive](https://is.muni.cz/th/mnrr8/thesis-archive.zip) of my Adaptive Cybersecurity Games thesis.
 2. In the archive, replace the `assistant/` folder with the folder of this repository.
 (The assistant included with the thesis is an earlier version.)
-3. Make sure that the sample files in the `resources/` subfolder are present.
+3. Extract `game.zip` from the archive. (So that you have a `game/` folder.)
+4. Make sure that the sample files in the `resources/` subfolder are present.
+5. Run the assistant as intended.
 
 The assistant should run the game included with my thesis using the sample resources files.
 The level instructions for that game are included in the `wiki/` subfolder of the thesis archive you downloaded.
