@@ -302,49 +302,65 @@ def game_loop():
     print("Basic commands are:")
     print("(S)tart, (N)ext, (H)elp, (C)heck, (E)xit")
     while True:
-        print("Waiting for your input:")
-        command = input()
-        command = command.lower()
-        if command in ("a", "abort", "(a)bort"):
-            abort_game(game, hint_giver, flag_checker)
-        elif command in ("e", "exit"):
-            abort_game(game, hint_giver, flag_checker)
-            print("Exiting...")
-            return
-        elif command in ("s", "start", "(s)tart"):
-            start_game(game, level_selector)
-        elif command in ("n", "next", "(n)ext"):
-            try:
-                if game.level == 0:
-                    print("Can't continue, (S)tart the game first!")
-                elif game.level == 5:
-                    print("Can't continue, you are on the last level!")
-                    print("Make sure to run (F)inish and (L)og your progress before exiting.")
+        try:
+            print("Waiting for your input:")
+            command = input()
+            command = command.lower()
+            if command in ("a", "abort", "(a)bort"):
+                abort_game(game, hint_giver, flag_checker)
+            elif command in ("e", "exit"):
+                abort_game(game, hint_giver, flag_checker)
+                print("Exiting...")
+                return
+            elif command in ("s", "start", "(s)tart"):
+                start_game(game, level_selector)
+            elif command in ("n", "next", "(n)ext"):
+                try:
+                    if game.level == 0:
+                        print("Can't continue, (S)tart the game first!")
+                    elif game.level == 5:
+                        print("Can't continue, you are on the last level!")
+                        print("Make sure to run (F)inish and (L)og your progress before exiting.")
+                    else:
+                        if check_flag(game.level, flag_checker):
+                            try_next_level(game, level_selector)
+                except NoLevelFoundError as err:
+                    print("Error encountered: {}".format(err))
+            elif command in ("f", "finish", "(f)inish"):
+                if (not game.game_in_progress and not game.game_finished):
+                    print("Can't finish game, game was not started yet.")
+                elif (not game.game_in_progress and game.game_finished):
+                    print("Can't finish game, game was already finished earlier.")
                 else:
                     if check_flag(game.level, flag_checker):
-                        try_next_level(game, level_selector)
-            except NoLevelFoundError as err:
-                print("Error encountered: {}".format(err))
-        elif command in ("f", "finish", "(f)inish"):
-            if (not game.game_in_progress and not game.game_finished):
-                print("Can't finish game, game was not started yet.")
-            elif (not game.game_in_progress and game.game_finished):
-                print("Can't finish game, game was already finished earlier.")
+                        finish_game(game)
+            elif command in ("i", "info", "information", "(i)nfo", "(i)nformation"):
+                game.print_info()
+            elif command in ("h", "help", "(h)elp"):
+                print_help()
+            elif command in ("c", "check", "(c)heck"):
+                check_prerequisites()
+            elif command in ("l", "log", "(l)og"):
+                player_logging(game, hint_giver, flag_checker)
+            elif command in ("t", "hint", "hin(t)"):
+                give_hint(game, hint_giver)
             else:
-                if check_flag(game.level, flag_checker):
-                    finish_game(game)
-        elif command in ("i", "info", "information", "(i)nfo", "(i)nformation"):
-            game.print_info()
-        elif command in ("h", "help", "(h)elp"):
-            print_help()
-        elif command in ("c", "check", "(c)heck"):
-            check_prerequisites()
-        elif command in ("l", "log", "(l)og"):
-            player_logging(game, hint_giver, flag_checker)
-        elif command in ("t", "hint", "hin(t)"):
-            give_hint(game, hint_giver)
-        else:
+                print("Unknown command. Enter another command or try (H)elp.")
+        except EOFError:
             print("Unknown command. Enter another command or try (H)elp.")
+            print("If you want to exit the assistant, please use the `exit` command.")
+        except KeyboardInterrupt:
+            print("You sent a keyboard interrupt to the program.")
+            print("Would you like to exit? yes/no")
+            confirmation = input()
+            confirmation = confirmation.lower()
+            if confirmation in ("y", "yes"):
+                abort_game(game, hint_giver, flag_checker)
+                print("Exiting...")
+                return
+            else:
+                print("Not exiting. Continuing normal operation.")
+                print("Next time, please use the `exit` command to exit.")
 
 
 if __name__ == "__main__":
