@@ -351,16 +351,14 @@ def game_loop():
             print("If you want to exit the assistant, please use the `exit` command.")
         except KeyboardInterrupt:
             print("You sent a keyboard interrupt to the program.")
-            print("Would you like to exit? yes/no")
+            print("Would you like to exit?")
+            print("This will NOT save your log or end the game. yes/no")
             confirmation = input()
             confirmation = confirmation.lower()
             if confirmation in ("y", "yes"):
-                abort_game(game, hint_giver, flag_checker)
-                print("Exiting...")
                 return
             else:
                 print("Not exiting. Continuing normal operation.")
-                print("Next time, please use the `exit` command to exit.")
 
 
 if __name__ == "__main__":
