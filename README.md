@@ -1,4 +1,14 @@
 # Adaptive game assistant
+
+> [!WARNING]
+> As of 2024, I'm archiving this repository and removing the adaptive game try-out section from the README.md.
+> The information in this README.md was correct as of 2022, but as Vagrant, VirtualBox, Ansible and the applications
+> used in individual games change, I can't guarantee that things will continue to work the way they did.
+
+> [!NOTE]
+> If you're a lector or an assistant of the PA197 course, you're probably looking for the the PA197 resources in the
+> university Gitlab instead of this repository.
+
 The adaptive game assistant is a Python program allowing easy deployment and playing of adaptive cybersecurity games.
 
 When bundled with a compatible game (and a few config files), the assistant
@@ -25,6 +35,7 @@ Basic commands:
 - (L)og   - saves data from the game into a file.
 
 The project's wiki has a user guide with examples: [Assistant guide](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Assistant-guide)
+
 ## Requirements
 The assistant requires Python 3.7 or higher to run.
 
@@ -66,18 +77,6 @@ The needed files are:
 - `tools.yml`
 
 More about the config files and their format is on the wiki: [Config files](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Config-files)
-## I want to try out the assistant, but I don't have an adaptive game
-The simplest way to try the assistant out with no access to another adaptive game is:
-
-1. Download the [thesis archive](https://is.muni.cz/th/mnrr8/thesis-archive.zip) of my Adaptive Cybersecurity Games thesis.
-2. In the archive, replace the `assistant/` folder with the folder of this repository.
-(The assistant included with the thesis is an earlier version.)
-3. Extract `game.zip` from the archive. (So that you have a `game/` folder.)
-4. From the file `game/provisioning/roles/attacker/tasks/main.yml`, delete lines 34-39.
-5. Run the assistant.
-
-The assistant should run the game included with my thesis using the sample resources files.
-The level instructions for that game are included in the `wiki/` subfolder of the thesis archive you downloaded.
 
 ## Troubleshooting
 All known common problems are in the [troubleshooting](https://github.com/SleepyLili/adaptive-game-assistant/wiki/Troubleshooting) doc on the repository wiki.
